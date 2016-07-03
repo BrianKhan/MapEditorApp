@@ -1,0 +1,29 @@
+/* 
+    This style sheet stylizes the controls inside our
+    Web Page Maker JavaFX application. Note that controls
+    in the UI must have the same class as those below in 
+    order to be rendered using those properties.
+
+    Author:	Richard McKenna
+    Author:	?
+    Version:	1.0
+*/
+
+.bordered_pane {
+    -fx-background-color: #aaaaff;
+    -fx-background-radius: 5.0;
+    -fx-padding: 15;
+    -fx-spacing: 10;
+    -fx-border-width: 2px;
+    -fx-border-color: #7777dd;
+}
+
+.heading_label {
+    -fx-font-size: 20pt;
+    -fx-font-weight: bold;
+}
+
+.subheading_label {
+    -fx-font-size: 14pt;
+    -fx-font-weight: bold;
+}
