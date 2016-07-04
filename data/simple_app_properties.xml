@@ -18,12 +18,24 @@
         <property name="LOAD_ICON"	    value="Load.png"></property>
         <property name="SAVE_ICON"	    value="Save.png"></property>
         <property name="EXIT_ICON"          value="Exit.png"></property> 
+        <property name="EXPORT_ICON"        value="Export.png"></property>
+        <property name="CHANGE_NAME"        value="Change.png"></property>
+        <property name="ADD_ICON"           value="Add.png"></property> 
+        <property name="CHANGE_COLOR"       value="Change_Color.png"></property>
+        <property name="REASSIGN_ICON"      value="Reassign.png"></property>
         
         <!-- TOOLTIPS FOR BUTTONS -->
         <property name="NEW_TOOLTIP"		value="Will not be used"></property>
         <property name="LOAD_TOOLTIP"		value="Load a Map"></property>
         <property name="SAVE_TOOLTIP"		value="Will not be used"></property>
         <property name="EXIT_TOOLTIP"		value="Exit the Application"></property>
+        <property name="EXPORT_TOOLTIP"     value="Export the image"></property>
+        <property name="CHANGE_TOOLTIP"     value="Change the map name"></property>
+        <property name="ADD_TOOLTIP"        value="Add an image to the map"></property>
+        <property name="CHANGE_COLOR_TOOLTIP"   value="Change the color of this region"></property>
+        <property name="REASSIGN_COLOR_TOOLTIP"     value="Randomly reassign the colors on the map"></property>
+        <property name="THICKNESS_TOOLTIP"      value="Thickness"></property>
+        <property name="ZOOM_TOOLTIP"           value="Zoom"></property>
         
         <!-- ERROR MESSAGES -->
         <property name="CLOSE_BUTTON_TEXT"              value="Close"></property>
