@@ -11,5 +11,8 @@ package rgvm;
  */
 public enum PropertyType {
     OK_PROMPT,
-    CANCEL_PROMPT
+    CANCEL_PROMPT,
+    NAME_COLUMN_HEADING,
+    CAPITAL_COLUMN_HEADING,
+    LEADER_COLUMN_HEADING
 }

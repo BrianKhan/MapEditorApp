@@ -14,6 +14,9 @@
 	<property name="ATTRIBUTE_UPDATE_ERROR_TITLE"	    value="Attribute Update Error"></property>
 	<property name="UPDATE_ERROR_MESSAGE"		    value="An error occured updating the UI"></property>
 	<property name="UPDATE_ERROR_TITLE"		    value="UI Update Error"></property>
+    <property name="NAME_COLUMN_HEADING"        value="Name"></property>
+    <property name="CAPITAL_COLUMN_HEADING"     value="Capital"></property>
+    <property name="LEADER_COLUMN_HEADING"      value="Leader"></property>
     </property_list>
     <property_options_list>
     </property_options_list>

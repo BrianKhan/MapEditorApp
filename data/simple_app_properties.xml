@@ -23,11 +23,14 @@
         <property name="ADD_ICON"           value="Add.png"></property> 
         <property name="CHANGE_COLOR"       value="Change_Color.png"></property>
         <property name="REASSIGN_ICON"      value="Reassign.png"></property>
+        <property name="PLAY_ICON"          value="Play.png"></property>
+        <property name="PAUSE_ICON"         value="Pause.png"></property>
+        <property name="IMAGE_TEST"             value="Test.png"></property>
         
         <!-- TOOLTIPS FOR BUTTONS -->
-        <property name="NEW_TOOLTIP"		value="Will not be used"></property>
+        <property name="NEW_TOOLTIP"		value="Create new project"></property>
         <property name="LOAD_TOOLTIP"		value="Load a Map"></property>
-        <property name="SAVE_TOOLTIP"		value="Will not be used"></property>
+        <property name="SAVE_TOOLTIP"		value="Save project"></property>
         <property name="EXIT_TOOLTIP"		value="Exit the Application"></property>
         <property name="EXPORT_TOOLTIP"     value="Export the image"></property>
         <property name="CHANGE_TOOLTIP"     value="Change the map name"></property>
@@ -36,6 +39,9 @@
         <property name="REASSIGN_COLOR_TOOLTIP"     value="Randomly reassign the colors on the map"></property>
         <property name="THICKNESS_TOOLTIP"      value="Thickness"></property>
         <property name="ZOOM_TOOLTIP"           value="Zoom"></property>
+        <property name="PLAY_TOOLTIP"           value="Play the anthem"></property>
+        <property name="PAUSE_TOOLTIP"          value="Pause the anthem"></property>
+
         
         <!-- ERROR MESSAGES -->
         <property name="CLOSE_BUTTON_TEXT"              value="Close"></property>
@@ -51,7 +57,7 @@
 	
         <!-- VERIFICATION MESSAGES -->
 	
-        <property name="NEW_COMPLETED_MESSAGE"		value="New Work Ready for Editing"></property>
+        <property name="NEW_COMPLETED_MESSAGE"		value="Driver test enabled"></property>
         <property name="NEW_COMPLETED_TITLE"		value="New Work Created"></property>
         <property name="LOAD_COMPLETED_MESSAGE"		value="File Loading Completed and ready for editing"></property>
         <property name="LOAD_COMPLETED_TITLE"		value="Loading Completed"></property>
