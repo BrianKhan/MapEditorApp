@@ -14,5 +14,13 @@ public enum PropertyType {
     CANCEL_PROMPT,
     NAME_COLUMN_HEADING,
     CAPITAL_COLUMN_HEADING,
-    LEADER_COLUMN_HEADING
+    LEADER_COLUMN_HEADING,
+    YES,
+    NO,
+    LEFT,
+    RIGHT,
+    NAME,
+    LEADER,
+    CAPITAL,
+    
 }

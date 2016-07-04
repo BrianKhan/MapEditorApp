@@ -11,11 +11,13 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import properties_manager.PropertiesManager;
 import rgvm.PropertyType;
 import saf.components.AppWorkspaceComponent;
 import rgvm.RegioVincoMapEditor;
+import rgvm.controller.MapEditorController;
 import rgvm.data.DataManager;
 import rgvm.data.RegionItem;
 import static saf.settings.AppStartupConstants.FILE_PROTOCOL;
@@ -37,6 +39,8 @@ public class Workspace extends AppWorkspaceComponent {
     public Workspace(RegioVincoMapEditor initApp) {
         app = initApp;
         layoutGUI();
+        workspace.setDividerPosition(0,.885);
+        setupHandlers();
 
     }
 
@@ -85,5 +89,20 @@ public class Workspace extends AppWorkspaceComponent {
     @Override
     public void initStyle() {
 
+    }
+    
+    public void setupHandlers() {
+        MapEditorController controller = new MapEditorController();
+        
+        itemsTable.setOnMouseClicked(e -> {
+            
+            if (e.getClickCount() == 2) {
+                if (itemsTable.getSelectionModel().getSelectedItem() != null) {
+                    
+                    controller.processEditItem(itemsTable.getSelectionModel().getSelectedItem());
+                }
+            }
+
+        });
     }
 }
