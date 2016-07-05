@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -124,7 +125,8 @@ public class ColorDialog extends Stage {
         initOwner(primaryStage);
         }
         // LABELS AND TEXT FIELDS
-        nameLabel = new Label(props.getProperty(PropertyType.COLOR));        
+        nameLabel = new Label(props.getProperty(PropertyType.COLOR));
+        ColorPicker cp = new ColorPicker();
         leaderLabel = new Label(props.getProperty(PropertyType.LEADER));
         capitalLabel = new Label(props.getProperty(PropertyType.CAPITAL));
 
@@ -154,8 +156,10 @@ public class ColorDialog extends Stage {
         
         // CATEGORY HBOX
         nameBox = new HBox();
+        nameBox.setAlignment(Pos.CENTER);
         nameBox.getChildren().add(nameLabel);
-        nameBox.getChildren().add(nameField = new TextField("CurrentColor"));
+        //nameBox.getChildren().add(nameField = new TextField("CurrentColor"));
+        nameBox.getChildren().add(cp);
         
         // END HBOX
         endBox = new HBox();
@@ -182,8 +186,8 @@ public class ColorDialog extends Stage {
 
         // AND PUT IT IN THE WINDOW
         messageScene = new Scene(messagePane);
-        this.setWidth(350);
-        this.setHeight(250);
+        this.setWidth(225);
+        this.setHeight(150);
         this.setScene(messageScene);
     }
 
