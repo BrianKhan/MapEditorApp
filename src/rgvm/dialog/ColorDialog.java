@@ -18,8 +18,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import properties_manager.PropertiesManager;
@@ -28,9 +26,7 @@ import static saf.components.AppStyleArbiter.CLASS_BORDERED_PANE;
 import static saf.components.AppStyleArbiter.CLASS_SUBHEADING_LABEL;
 import rgvm.PropertyType;
 import rgvm.data.RegionItem;
-import static saf.settings.AppStartupConstants.FILE_PROTOCOL;
-import static saf.settings.AppStartupConstants.PATH_IMAGES;
-import static saf.settings.AppPropertyType.*;
+
 /**
  * This class is heavily based on AppYesNoCancelDialogSingleton 
  * with changes made to it to allow for a custom add function
@@ -39,9 +35,9 @@ import static saf.settings.AppPropertyType.*;
  * @author Brian Khaneyan
  * @version 1.0
  */
-public class EditDialog extends Stage {
+public class ColorDialog extends Stage {
     // HERE'S THE SINGLETON
-    static EditDialog singleton;
+    static ColorDialog singleton;
     
     // GUI CONTROLS FOR OUR DIALOG
     VBox messagePane;
@@ -50,7 +46,6 @@ public class EditDialog extends Stage {
     HBox leaderBox;
     HBox capitalBox;
     HBox endBox;
-    HBox imageBox;
     
     CheckBox checkField;
     
@@ -77,8 +72,6 @@ public class EditDialog extends Stage {
     PropertiesManager props;
     String YES;
     String NO;
-    String LEFT;
-    String RIGHT;
 
     /**
      *
@@ -96,12 +89,10 @@ public class EditDialog extends Stage {
      * 
      * @param primaryStage The owner of this modal dialog.
      */
-    private EditDialog() {
+    private ColorDialog() {
         props = PropertiesManager.getPropertiesManager();
         YES = props.getProperty(PropertyType.YES);
         NO = props.getProperty(PropertyType.NO);
-        LEFT = props.getProperty(PropertyType.LEFT);
-        RIGHT = props.getProperty(PropertyType.RIGHT);
     }
     
     /**
@@ -109,9 +100,9 @@ public class EditDialog extends Stage {
      * 
      * @return The singleton object for this type.
      */
-    public static EditDialog getSingleton() {
+    public static ColorDialog getSingleton() {
 	if (singleton == null)
-	    singleton = new EditDialog();
+	    singleton = new ColorDialog();
 	return singleton;
     }
 	
@@ -133,7 +124,7 @@ public class EditDialog extends Stage {
         initOwner(primaryStage);
         }
         // LABELS AND TEXT FIELDS
-        nameLabel = new Label(props.getProperty(PropertyType.NAME));        
+        nameLabel = new Label(props.getProperty(PropertyType.COLOR));        
         leaderLabel = new Label(props.getProperty(PropertyType.LEADER));
         capitalLabel = new Label(props.getProperty(PropertyType.CAPITAL));
 
@@ -149,67 +140,36 @@ public class EditDialog extends Stage {
         // YES, NO, AND CANCEL BUTTONS
         yesButton = new Button(YES);
         noButton = new Button(NO);
-        leftButton = new Button(LEFT);
-        rightButton = new Button(RIGHT);
-        //cancelButton = new Button(CANCEL);
 	
 	// MAKE THE EVENT HANDLER FOR THESE BUTTONS
         EventHandler yesNoCancelHandler = (EventHandler<ActionEvent>) (ActionEvent ae) -> {
             Button sourceButton = (Button)ae.getSource();
-            EditDialog.this.selection = sourceButton.getText();
-            EditDialog.this.hide();
+            ColorDialog.this.selection = sourceButton.getText();
+            ColorDialog.this.hide();
         };
         
 	// AND THEN REGISTER THEM TO RESPOND TO INTERACTIONS
         yesButton.setOnAction(yesNoCancelHandler);
         noButton.setOnAction(yesNoCancelHandler);
-      //  cancelButton.setOnAction(yesNoCancelHandler);
         
         // CATEGORY HBOX
         nameBox = new HBox();
         nameBox.getChildren().add(nameLabel);
-        nameBox.getChildren().add(nameField = new TextField());
-        
-        // DESCRIPTION HBOX
-        leaderBox = new HBox();
-        leaderBox.getChildren().add(leaderLabel);
-        leaderBox.getChildren().add(leaderField);
-        
-        // START HBOX
-        capitalBox = new HBox();
-        capitalBox.getChildren().add(capitalLabel);
-        capitalBox.getChildren().add(capitalField);
+        nameBox.getChildren().add(nameField = new TextField("CurrentColor"));
         
         // END HBOX
-        imageBox = new HBox();
-        String imagePath = FILE_PROTOCOL + PATH_IMAGES + props.getProperty(LEADER_PATH.toString());
-        ImageView holder = new ImageView(imagePath);
-        holder.setFitHeight(50);
-        holder.setFitWidth(50);
-        String secondPath = FILE_PROTOCOL + PATH_IMAGES + props.getProperty(FLAG_PATH.toString());
-        ImageView holders = new ImageView(secondPath);
-        holders.setFitHeight(50);
-        holders.setFitWidth(100);
-        imageBox.getChildren().add(holder);
-        imageBox.getChildren().add(holders);
-        
-        
+        endBox = new HBox();
         
         // NOW ORGANIZE OUR BUTTONS
         HBox buttonBox = new HBox();
-        buttonBox.getChildren().add(leftButton);
         buttonBox.getChildren().add(yesButton);
         buttonBox.getChildren().add(noButton);
-        buttonBox.getChildren().add(rightButton);
-       // buttonBox.getChildren().add(cancelButton);
+
         
         // WE'LL PUT EVERYTHING HERE
         messagePane = new VBox();
         messagePane.setAlignment(Pos.CENTER);
         messagePane.getChildren().add(nameBox);
-        messagePane.getChildren().add(leaderBox);
-        messagePane.getChildren().add(capitalBox);
-        messagePane.getChildren().add(imageBox);
         buttonBox.setAlignment(Pos.CENTER);
         
         messagePane.getChildren().add(buttonBox);

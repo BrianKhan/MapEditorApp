@@ -76,6 +76,7 @@ public class RegioVincoMapEditor extends AppTemplate {
 	    @Override
 	    public AppWorkspaceComponent buildWorkspaceComponent() throws Exception {
 		return new Workspace(RegioVincoMapEditor.this);
+                
 	    }
 	};
     }

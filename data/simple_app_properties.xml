@@ -26,6 +26,8 @@
         <property name="PLAY_ICON"          value="Play.png"></property>
         <property name="PAUSE_ICON"         value="Pause.png"></property>
         <property name="IMAGE_TEST"             value="Test.png"></property>
+        <property name="LEADER_PATH"            value="Leader.png"></property>
+        <property name="FLAG_PATH"              value="Flag.png"></property>
         
         <!-- TOOLTIPS FOR BUTTONS -->
         <property name="NEW_TOOLTIP"		value="Create new project"></property>

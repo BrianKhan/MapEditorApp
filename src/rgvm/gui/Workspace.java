@@ -23,6 +23,7 @@ import rgvm.data.RegionItem;
 import static saf.settings.AppStartupConstants.FILE_PROTOCOL;
 import static saf.settings.AppStartupConstants.PATH_IMAGES;
 import static saf.settings.AppPropertyType.*;
+import saf.ui.AppGUI;
 
 /**
  *
@@ -35,13 +36,15 @@ public class Workspace extends AppWorkspaceComponent {
     TableColumn nameColumn;
     TableColumn capitalColumn;
     TableColumn leaderColumn;
+    AppGUI gui;
 
     public Workspace(RegioVincoMapEditor initApp) {
         app = initApp;
+        gui = app.getGUI();
         layoutGUI();
         workspace.setDividerPosition(0,.885);
         setupHandlers();
-
+        
     }
 
     public void layoutGUI() {
@@ -93,7 +96,12 @@ public class Workspace extends AppWorkspaceComponent {
     
     public void setupHandlers() {
         MapEditorController controller = new MapEditorController();
-        
+        gui.getColorButton().setOnMouseClicked(e -> {
+            controller.processColorButton();
+        });
+        gui.getNewButton().setOnMouseClicked(e-> { 
+            controller.processNewButton();
+        });
         itemsTable.setOnMouseClicked(e -> {
             
             if (e.getClickCount() == 2) {

@@ -22,5 +22,7 @@ public enum PropertyType {
     NAME,
     LEADER,
     CAPITAL,
+    COLOR,
+    
     
 }

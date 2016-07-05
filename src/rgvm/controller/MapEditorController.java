@@ -7,7 +7,9 @@ package rgvm.controller;
 
 import javafx.stage.Stage;
 import rgvm.data.RegionItem;
+import rgvm.dialog.ColorDialog;
 import rgvm.dialog.EditDialog;
+import rgvm.dialog.NewDialog;
 
 /**
  *
@@ -19,6 +21,18 @@ public class MapEditorController {
     }
     public void processEditItem(RegionItem e) {
         EditDialog myDiag = EditDialog.getSingleton();
+        Stage newStage = new Stage();
+        myDiag.init(newStage);
+        myDiag.show();
+    }
+    public void processColorButton() {
+        ColorDialog myDiag = ColorDialog.getSingleton();
+        Stage newStage = new Stage();
+        myDiag.init(newStage);
+        myDiag.show();
+    }
+    public void processNewButton() {
+        NewDialog myDiag = NewDialog.getSingleton();
         Stage newStage = new Stage();
         myDiag.init(newStage);
         myDiag.show();
