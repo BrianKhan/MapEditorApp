@@ -151,8 +151,13 @@ public class NewDialog extends Stage {
         noButton.setOnAction(yesNoCancelHandler);
 
         // CATEGORY HBOX
+        HBox notherBox = new HBox();
+        notherBox.getChildren().add(new Label("Name: "));
+        notherBox.getChildren().add(new TextField());
+        
         nameBox = new HBox();
-        nameBox.getChildren().add(nameLabel);
+        
+        nameBox.getChildren().add(new Label("Parent Directory: "));
         nameBox.getChildren().add(nameField = new TextField("Parent Directory"));
         Button directButton = new Button("Choose Parent Directory");
         nameBox.getChildren().add(directButton);
@@ -184,6 +189,7 @@ public class NewDialog extends Stage {
         // WE'LL PUT EVERYTHING HERE
         messagePane = new VBox();
         messagePane.setAlignment(Pos.CENTER);
+        messagePane.getChildren().add(notherBox);
         messagePane.getChildren().add(nameBox);
         messagePane.getChildren().add(dataBox);
         buttonBox.setAlignment(Pos.CENTER);
