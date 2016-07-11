@@ -1,0 +1,81 @@
+
+{
+    "name":"name value",
+    "subregions_have_capitals":true,
+    "subregions_have_flags":true,
+    "subregions_have_leaders":true,
+    "subregions":[
+        {
+            "name":"NAME VALUE",
+            "capital":"LEADER  VALUE",
+            "leader":"Capital value",
+            "red":8193397,
+            "green":13807165,
+            "blue":8652653
+        },
+        {
+            "name":"NAME VALUE",
+            "capital":"LEADER  VALUE",
+            "leader":"Capital value",
+            "red":732932,
+            "green":4645354,
+            "blue":4478577
+        },
+        {
+            "name":"NAME VALUE",
+            "capital":"LEADER  VALUE",
+            "leader":"Capital value",
+            "red":8579053,
+            "green":7281082,
+            "blue":11196428
+        },
+        {
+            "name":"NAME VALUE",
+            "capital":"LEADER  VALUE",
+            "leader":"Capital value",
+            "red":9597205,
+            "green":5622259,
+            "blue":5196785
+        },
+        {
+            "name":"NAME VALUE",
+            "capital":"LEADER  VALUE",
+            "leader":"Capital value",
+            "red":5582999,
+            "green":4163737,
+            "blue":15121201
+        },
+        {
+            "name":"NAME VALUE",
+            "capital":"LEADER  VALUE",
+            "leader":"Capital value",
+            "red":10089625,
+            "green":12355695,
+            "blue":14009325
+        },
+        {
+            "name":"NAME VALUE",
+            "capital":"LEADER  VALUE",
+            "leader":"Capital value",
+            "red":11288658,
+            "green":7582084,
+            "blue":6578036
+        },
+        {
+            "name":"NAME VALUE",
+            "capital":"LEADER  VALUE",
+            "leader":"Capital value",
+            "red":10691206,
+            "green":15259179,
+            "blue":11282259
+        },
+        {
+            "name":"NAME VALUE",
+            "capital":"LEADER  VALUE",
+            "leader":"Capital value",
+            "red":15652272,
+            "green":15692331,
+            "blue":949044
+        }
+    ]
+}

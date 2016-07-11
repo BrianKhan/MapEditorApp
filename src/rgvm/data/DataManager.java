@@ -2,6 +2,7 @@ package rgvm.data;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.ProgressBar;
 import saf.components.AppDataComponent;
 import rgvm.RegioVincoMapEditor;
 import rgvm.gui.Workspace;
@@ -25,11 +26,15 @@ public class DataManager implements AppDataComponent {
     String rawPath;
     String bigFlagPath;
     String sealPath;
+    Workspace workspace;
+    boolean hasCapital;
+    boolean hasLeader;
+    boolean hasFlag;
 
     public DataManager(RegioVincoMapEditor initApp) {
         app = initApp;
         data = FXCollections.observableArrayList();
-        Workspace workspace = (Workspace) app.getWorkspaceComponent();
+        workspace = (Workspace) app.getWorkspaceComponent();
     }
 
     @Override
@@ -47,6 +52,41 @@ public class DataManager implements AppDataComponent {
         bigFlagPath = null;
         sealPath = null;
 
+    }
+
+    public boolean hasCapitals() {
+        for (int i = 0; i < data.size(); i++) {
+            if (data.get(i).getCapital() == "") {
+                return false;
+            }
+        }
+        return true;
+    }
+    public boolean hasLeaders() {
+        for (int i = 0; i < data.size(); i++) {
+            if (data.get(i).getLeader() == "") {
+                return false;
+            }
+        }
+        return true;
+    }
+    public boolean hasFlags() {
+        for (int i = 0; i < data.size(); i++) {
+            if (data.get(i).getFlagPath() == "") {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void setProgress(double progress) {
+        workspace = (Workspace) app.getWorkspaceComponent();
+        workspace.getPB().setProgress(progress);
+    }
+
+    public ProgressBar getPB() {
+        workspace = (Workspace) app.getWorkspaceComponent();
+        return workspace.getPB();
     }
 
     public ObservableList<RegionItem> getItems() {

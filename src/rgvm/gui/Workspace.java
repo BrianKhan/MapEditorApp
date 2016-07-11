@@ -7,6 +7,8 @@ package rgvm.gui;
 
 import java.util.ArrayList;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -15,6 +17,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Polygon;
@@ -52,6 +55,7 @@ public class Workspace extends AppWorkspaceComponent {
     int yloc;
     Pane first;
     Pane second;
+    ProgressBar pb;
 
     public Workspace(RegioVincoMapEditor initApp) {
         app = initApp;
@@ -59,7 +63,17 @@ public class Workspace extends AppWorkspaceComponent {
         layoutGUI();
         workspace.setDividerPosition(0, .885);
         setupHandlers();
+        FlowPane progPane = new FlowPane();
+        app.getGUI().getAppPane().setBottom(progPane);
+        Label progress = new Label("Progress");
+        pb = new ProgressBar(0);
+        progPane.getChildren().add(progress);
+        progPane.getChildren().add(pb);
 
+    }
+    public ProgressBar getPB() {
+        
+        return pb;
     }
 
     public void layoutGUI() {
@@ -125,6 +139,11 @@ public class Workspace extends AppWorkspaceComponent {
         gui.getFreePane().getChildren().add(testLoader);
         testLoader.setOnMouseClicked(e-> {
             controller.processLoadBig(app);
+        });
+        Button testExport = new Button("Export to RVM file");
+        gui.getFreePane().getChildren().add(testExport);
+        testExport.setOnMouseClicked(e-> {
+            controller.processExportTest(app);
         });
         itemsTable.setOnMouseClicked(e -> {
 

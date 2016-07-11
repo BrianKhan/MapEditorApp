@@ -73,6 +73,20 @@ public class MapEditorController {
         }
 
     }
+    public void processExportTest(RegioVincoMapEditor app) {
+        FileChooser fc = new FileChooser();
+        fc.setInitialDirectory(new File("./export/"));
+        fc.setTitle("Save Work to RVM File");
+        fc.getExtensionFilters().addAll(
+                new ExtensionFilter("Regio Vinco Map File", "*.rvm"));
+        File selectedFile = fc.showSaveDialog(app.getGUI().getWindow());
+        try {
+            
+            app.getFileComponent().exportData(app.getDataComponent(), selectedFile.getAbsolutePath());
+        } catch (IOException ex) {
+            System.out.println("errors");
+        }
+    }
     public void processLoadBig(RegioVincoMapEditor app) {
         app.getDataComponent().reset();
         FileChooser fc = new FileChooser();
@@ -124,8 +138,8 @@ public class MapEditorController {
                 myit.setLeaderPath("LEADER_PATH_VALUE");
                 myit.setName("NAME VALUE");
                 for (Double[] myar : myit.getList()) {
-                    System.out.println("X: " + myar[0]);
-                    System.out.println("Y: " + myar[1]);
+                //    System.out.println("X: " + myar[0]);
+                //    System.out.println("Y: " + myar[1]);
                 }
             }
         } catch (IOException ex) {

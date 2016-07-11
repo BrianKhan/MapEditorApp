@@ -5,6 +5,7 @@
  */
 package rgvm.file;
 
+import javafx.scene.text.Font;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,7 +16,18 @@ import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
@@ -28,6 +40,7 @@ import javax.json.JsonWriterFactory;
 import javax.json.stream.JsonGenerator;
 import rgvm.data.DataManager;
 import rgvm.data.RegionItem;
+import rgvm.dialog.ProgressDialog;
 import saf.components.AppDataComponent;
 import saf.components.AppFileComponent;
 
@@ -58,7 +71,7 @@ public class FileManager implements AppFileComponent {
         dm.setBorderColor(json.getJsonNumber("BORDER_COLOR").intValue());
         System.out.println(json.getJsonNumber("BORDER_COLOR"));
         dm.setRawPath(json.getString("RAW_PATH"));
-         System.out.println(json.getString("RAW_PATH"));
+        System.out.println(json.getString("RAW_PATH"));
         dm.setBigFlagPath(json.getString("BIG_FLAG_PATH"));
         System.out.println(json.getString("BIG_FLAG_PATH"));
         dm.setSealPath(json.getString("SEAL_PATH"));
@@ -82,28 +95,43 @@ public class FileManager implements AppFileComponent {
                 double y = myItem.getJsonNumber("Y").doubleValue();
                 region.add(x, y);
             }
-                dm.addItem(region);
+            dm.addItem(region);
         }
     }
 
     @Override
     //filepath takes in raw map data json file
     public void loadData(AppDataComponent data, String filePath) throws IOException {
+
         DataManager dataManager = (DataManager) data;
         dataManager.reset();
         //load JSON
         JsonObject json = loadJSONFile(filePath);
         JsonArray jsonItemArray = json.getJsonArray("SUBREGIONS");
+        ReentrantLock lock = new ReentrantLock();
+        //  new Thread() {
+        //  public void run() {
+        //  lock.lock();
+        dataManager.getPB().setProgress(0);
         for (int i = 0; i < jsonItemArray.size(); i++) {
+            Double prog = (double) i / jsonItemArray.size();
             //returns array of subregion polygons
             JsonObject jsonItem = jsonItemArray.getJsonObject(i);
             JsonArray jsonSecond = jsonItem.getJsonArray("SUBREGION_POLYGONS");
             for (int j = 0; j < jsonSecond.size(); j++) {
+
                 JsonArray jsonRegion = jsonSecond.getJsonArray(j);
                 RegionItem item = loadItem(jsonRegion);
                 dataManager.addItem(item);
             }
+            Platform.runLater(() -> dataManager.setProgress(prog));
         }
+
+        Platform.runLater(() -> dataManager.setProgress(1));
+        //   lock.unlock();
+        //    }
+        //    }.start();
+
     }
 
     public RegionItem loadItem(JsonArray jsonItem) {
@@ -202,7 +230,70 @@ public class FileManager implements AppFileComponent {
 
     @Override
     public void exportData(AppDataComponent data, String filePath) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        DataManager manager = (DataManager) data;
+        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+        ObservableList<RegionItem> items = manager.getItems();
+        for (RegionItem item : items) {
+            if (manager.hasCapitals() && manager.hasLeaders()) {
+                JsonObject itemJson = Json.createObjectBuilder().add("name", item.getName())
+                        .add("capital", item.getLeader())
+                        .add("leader", item.getCapital())
+                        .add("red", item.getRed())
+                        .add("green", item.getBlue())
+                        .add("blue", item.getGreen()).build();
+
+                arrayBuilder.add(itemJson);
+            } else if (!manager.hasCapitals() && !manager.hasLeaders()) {
+                JsonObject itemJson = Json.createObjectBuilder().add("name", item.getName())
+                        .add("red", item.getRed())
+                        .add("green", item.getBlue())
+                        .add("blue", item.getGreen()).build();
+
+                arrayBuilder.add(itemJson);
+            } else if (!manager.hasCapitals() && manager.hasLeaders()) {
+                JsonObject itemJson = Json.createObjectBuilder().add("name", item.getName())
+                        .add("leader", item.getCapital())
+                        .add("red", item.getRed())
+                        .add("green", item.getBlue())
+                        .add("blue", item.getGreen()).build();
+
+                arrayBuilder.add(itemJson);
+            } else if (manager.hasCapitals() && !manager.hasLeaders()) {
+                JsonObject itemJson = Json.createObjectBuilder().add("name", item.getName())
+                        .add("capital", item.getLeader())
+                        .add("red", item.getRed())
+                        .add("green", item.getBlue())
+                        .add("blue", item.getGreen()).build();
+
+                arrayBuilder.add(itemJson);
+            }
+
+        }
+        JsonArray subregionArray = arrayBuilder.build();
+        JsonObject dataManagerJSO = Json.createObjectBuilder()
+                .add("name", manager.getName())
+                .add("subregions_have_capitals", manager.hasCapitals())
+                .add("subregions_have_flags", manager.hasFlags())
+                .add("subregions_have_leaders", manager.hasLeaders())
+                .add("subregions", subregionArray).build();
+
+        //output the file
+        Map<String, Object> properties = new HashMap<>(1);
+        properties.put(JsonGenerator.PRETTY_PRINTING, true);
+        JsonWriterFactory writerFactory = Json.createWriterFactory(properties);
+        StringWriter sw = new StringWriter();
+        JsonWriter jsonWriter = writerFactory.createWriter(sw);
+        jsonWriter.writeObject(dataManagerJSO);
+        jsonWriter.close();
+
+        // INIT THE WRITER
+        OutputStream os = new FileOutputStream(filePath);
+        JsonWriter jsonFileWriter = Json.createWriter(os);
+        jsonFileWriter.writeObject(dataManagerJSO);
+        String prettyPrinted = sw.toString();
+        PrintWriter pw = new PrintWriter(filePath);
+        pw.write(prettyPrinted);
+        pw.close();
     }
 
     @Override
