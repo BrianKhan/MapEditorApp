@@ -86,6 +86,8 @@ public class MapEditorController {
         } catch (IOException ex) {
             System.out.println("error");
         }
+        Workspace work = (Workspace)app.getWorkspaceComponent();
+        work.polyLoad();
         
         
     }

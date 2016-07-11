@@ -111,7 +111,7 @@ public class Workspace extends AppWorkspaceComponent {
         gui.getNewButton().setOnMouseClicked(e -> {
             controller.processNewButton();
         });
-        Button testLoad = new Button("Load RVM(To be done for save testing)");
+        Button testLoad = new Button("Load RAW Json(To be done for save testing)");
         gui.getFreePane().getChildren().add(testLoad);
         testLoad.setOnMouseClicked(e -> {
             controller.processLoadTest(app);
