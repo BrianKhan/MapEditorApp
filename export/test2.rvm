@@ -1,0 +1,65 @@
+
+{
+    "name":"name value",
+    "subregions_have_capitals":true,
+    "subregions_have_flags":true,
+    "subregions_have_leaders":true,
+    "subregions":[
+        {
+            "name":"NAME VALUE",
+            "capital":"LEADER  VALUE",
+            "leader":"Capital value",
+            "red":14476691,
+            "green":3817690,
+            "blue":1286994
+        },
+        {
+            "name":"NAME VALUE",
+            "capital":"LEADER  VALUE",
+            "leader":"Capital value",
+            "red":1001259,
+            "green":11044670,
+            "blue":10008741
+        },
+        {
+            "name":"NAME VALUE",
+            "capital":"LEADER  VALUE",
+            "leader":"Capital value",
+            "red":2261062,
+            "green":14802790,
+            "blue":6379246
+        },
+        {
+            "name":"NAME VALUE",
+            "capital":"LEADER  VALUE",
+            "leader":"Capital value",
+            "red":13010389,
+            "green":10345818,
+            "blue":11725285
+        },
+        {
+            "name":"NAME VALUE",
+            "capital":"LEADER  VALUE",
+            "leader":"Capital value",
+            "red":4427707,
+            "green":6702297,
+            "blue":14176662
+        },
+        {
+            "name":"NAME VALUE",
+            "capital":"LEADER  VALUE",
+            "leader":"Capital value",
+            "red":9222157,
+            "green":14590842,
+            "blue":9757888
+        },
+        {
+            "name":"NAME VALUE",
+            "capital":"LEADER  VALUE",
+            "leader":"Capital value",
+            "red":8033066,
+            "green":1350750,
+            "blue":1804769
+        }
+    ]
+}
