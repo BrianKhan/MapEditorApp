@@ -34,6 +34,7 @@ import static saf.settings.AppStartupConstants.PATH_IMAGES;
 import static saf.settings.AppPropertyType.*;
 import saf.ui.AppGUI;
 
+
 /**
  *
  * @author McKillaGorilla
@@ -71,8 +72,9 @@ public class Workspace extends AppWorkspaceComponent {
         progPane.getChildren().add(pb);
 
     }
+
     public ProgressBar getPB() {
-        
+
         return pb;
     }
 
@@ -137,14 +139,19 @@ public class Workspace extends AppWorkspaceComponent {
         });
         Button testLoader = new Button("Load RVME file with print statements");
         gui.getFreePane().getChildren().add(testLoader);
-        testLoader.setOnMouseClicked(e-> {
+        testLoader.setOnMouseClicked(e -> {
             controller.processLoadBig(app);
         });
         Button testExport = new Button("Export to RVM file");
         gui.getFreePane().getChildren().add(testExport);
-        testExport.setOnMouseClicked(e-> {
+        testExport.setOnMouseClicked(e -> {
             controller.processExportTest(app);
         });
+        Button testJunit = new Button("Choose file and execute test");
+        gui.getFreePane().getChildren().add(testJunit);
+        testJunit.setOnMouseClicked(e -> {
+            controller.test(app);
+        }); 
         itemsTable.setOnMouseClicked(e -> {
 
             if (e.getClickCount() == 2) {
@@ -204,14 +211,14 @@ public class Workspace extends AppWorkspaceComponent {
     @Override
     public void reloadWorkspace() {
         DataManager dataManager = (DataManager) app.getDataComponent();
-       // first.getTransforms().clear();
-       // first.getChildren().clear();
+        // first.getTransforms().clear();
+        // first.getChildren().clear();
         counterZoom = 0;
         counterRight = 0;
         counterUp = 0;
         debug = 0;
         xloc = 0;
         yloc = 0;
-        
+
     }
 }

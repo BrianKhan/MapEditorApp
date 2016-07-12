@@ -66,13 +66,14 @@ public class MapEditorController {
         File selectedFile = fc.showSaveDialog(app.getGUI().getWindow());
 
         try {
-            
+
             app.getFileComponent().saveData(app.getDataComponent(), selectedFile.getAbsolutePath());
         } catch (IOException ex) {
             System.out.println("errors");
         }
 
     }
+
     public void processExportTest(RegioVincoMapEditor app) {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File("./export/"));
@@ -81,29 +82,78 @@ public class MapEditorController {
                 new ExtensionFilter("Regio Vinco Map File", "*.rvm"));
         File selectedFile = fc.showSaveDialog(app.getGUI().getWindow());
         try {
-            
+
             app.getFileComponent().exportData(app.getDataComponent(), selectedFile.getAbsolutePath());
         } catch (IOException ex) {
             System.out.println("errors");
         }
     }
+
     public void processLoadBig(RegioVincoMapEditor app) {
         app.getDataComponent().reset();
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File(PATH_WORK));
         fc.setTitle("RVME file");
         File selectedFile = fc.showOpenDialog(app.getGUI().getWindow());
-        
-            FileManager fm = (FileManager) app.getFileComponent();
+
+        FileManager fm = (FileManager) app.getFileComponent();
         try {
             fm.loadRVME(app.getDataComponent(), selectedFile.getAbsolutePath());
         } catch (IOException ex) {
             System.out.println("error");
         }
-        Workspace work = (Workspace)app.getWorkspaceComponent();
+        Workspace work = (Workspace) app.getWorkspaceComponent();
         work.polyLoad();
+
+    }
+
+    public void test(RegioVincoMapEditor app) {
+        app.getDataComponent().reset();
+        FileChooser fc = new FileChooser();
+        fc.setInitialDirectory(new File(PATH_RAW_FILES));
+        fc.setTitle("Raw Map File JSON");
+        File selectedFile = fc.showOpenDialog(app.getGUI().getWindow());
+        try {
+            app.getFileComponent().loadData(app.getDataComponent(), selectedFile.getAbsolutePath());
+            DataManager dm = (DataManager) app.getDataComponent();
+            dm.setBackgroundColor(010101);
+            dm.setBigFlagPath("Big flag path");
+            dm.setBorderColor(101010);
+            dm.setHeight(1000);
+            dm.setName("name value");
+            dm.setParent("Parent directory value");
+            dm.setRawPath("Raw path value");
+            dm.setSealPath("seal path value");
+            dm.setThickness(2.0);
+            dm.setWidth(1000);
+            dm.setZoom(2.0);
+            System.out.println("Writing to file: HARDCODED VALUES = 'background color = 010101' , 'big flag path = Big flag path' , 'border color = 101010' , 'height = 1000' , 'zoom = 2.0' , 'raw path value = Raw path value'");
+            for (RegionItem myit : dm.getItems()) {
+                myit.setBlue((int) (Math.random() * 0x1000000));
+                myit.setRed((int) (Math.random() * 0x1000000));
+                myit.setGreen((int) (Math.random() * 0x1000000));
+                myit.setCapital("Capital value");
+                myit.setFlagPath("FLAG_PATH_VALUE");
+                myit.setLeader("LEADER  VALUE");
+                myit.setLeaderPath("LEADER_PATH_VALUE");
+                myit.setName("NAME VALUE");
+                for (Double[] myar : myit.getList()) {
+                    //    System.out.println("X: " + myar[0]);
+                    //    System.out.println("Y: " + myar[1]);
+                }
+            }
+        } catch (IOException ex) {
+            System.out.println("errors");
+        }
+        Workspace work = (Workspace) app.getWorkspaceComponent();
+        System.out.println("saving file");
+        processSaveTest(app);
+        System.out.println("Loading in new RVME file");
+        processLoadBig(app);
+        DataManager dm = (DataManager) app.getDataComponent();
+        System.out.println("Current values: 'background color'= " +dm.getBackgroundColor() + " 'big flag path'= " +dm.getBigFlagPath() + " 'border color'= " +dm.getBorderColor() + " 'height'= " +dm.getHeight() + " 'zoom'= " +dm.getZoom() + " 'raw path value'= " +dm.getRawPath());
         
-        
+
     }
 
     public void processLoadTest(RegioVincoMapEditor app) {
@@ -129,23 +179,23 @@ public class MapEditorController {
             dm.setZoom(2.0);
             System.out.println(dm.getItems().size());
             for (RegionItem myit : dm.getItems()) {
-                myit.setBlue((int)(Math.random() * 0x1000000));
-                myit.setRed((int)(Math.random() * 0x1000000));
-                myit.setGreen((int)(Math.random() * 0x1000000));
+                myit.setBlue((int) (Math.random() * 0x1000000));
+                myit.setRed((int) (Math.random() * 0x1000000));
+                myit.setGreen((int) (Math.random() * 0x1000000));
                 myit.setCapital("Capital value");
                 myit.setFlagPath("FLAG_PATH_VALUE");
                 myit.setLeader("LEADER  VALUE");
                 myit.setLeaderPath("LEADER_PATH_VALUE");
                 myit.setName("NAME VALUE");
                 for (Double[] myar : myit.getList()) {
-                //    System.out.println("X: " + myar[0]);
-                //    System.out.println("Y: " + myar[1]);
+                    //    System.out.println("X: " + myar[0]);
+                    //    System.out.println("Y: " + myar[1]);
                 }
             }
         } catch (IOException ex) {
             System.out.println("errors");
         }
-        Workspace work = (Workspace)app.getWorkspaceComponent();
+        Workspace work = (Workspace) app.getWorkspaceComponent();
         work.polyLoad();
     }
 

@@ -275,6 +275,7 @@ public class FileManager implements AppFileComponent {
                 .add("subregions_have_capitals", manager.hasCapitals())
                 .add("subregions_have_flags", manager.hasFlags())
                 .add("subregions_have_leaders", manager.hasLeaders())
+                
                 .add("subregions", subregionArray).build();
 
         //output the file
