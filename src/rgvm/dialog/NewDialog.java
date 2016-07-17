@@ -51,7 +51,7 @@ public class NewDialog extends Stage {
 
     CheckBox checkField;
 
-    TextField nameField;
+    TextField parentField;
     TextField leaderField;
     TextField capitalField;
 
@@ -59,7 +59,7 @@ public class NewDialog extends Stage {
 
     Scene messageScene;
 
-    Label nameLabel;
+    Label parentLabel;
     Label leaderLabel;
     Label capitalLabel;
 
@@ -74,6 +74,7 @@ public class NewDialog extends Stage {
     String YES;
     String NO;
     Stage myStage;
+    String name;
 
     /**
      *
@@ -123,7 +124,8 @@ public class NewDialog extends Stage {
             initOwner(primaryStage);
         }
         // LABELS AND TEXT FIELDS
-        nameLabel = new Label(props.getProperty(PropertyType.NAME));
+        name = "";
+        parentLabel = new Label(props.getProperty(PropertyType.NAME));
         leaderLabel = new Label(props.getProperty(PropertyType.LEADER));
         capitalLabel = new Label(props.getProperty(PropertyType.CAPITAL));
 
@@ -131,7 +133,7 @@ public class NewDialog extends Stage {
         leaderLabel.getStyleClass().add(CLASS_SUBHEADING_LABEL);
         capitalLabel.getStyleClass().add(CLASS_SUBHEADING_LABEL);
 
-        nameField = new TextField();
+        parentField = new TextField();
         capitalField = new TextField();
         leaderField = new TextField();
 
@@ -143,6 +145,7 @@ public class NewDialog extends Stage {
         EventHandler yesNoCancelHandler = (EventHandler<ActionEvent>) (ActionEvent ae) -> {
             Button sourceButton = (Button) ae.getSource();
             NewDialog.this.selection = sourceButton.getText();
+            name = parentField.getText();
             NewDialog.this.hide();
         };
 
@@ -158,7 +161,7 @@ public class NewDialog extends Stage {
         nameBox = new HBox();
         
         nameBox.getChildren().add(new Label("Parent Directory: "));
-        nameBox.getChildren().add(nameField = new TextField("Parent Directory"));
+        nameBox.getChildren().add(parentField = new TextField("Parent Directory"));
         Button directButton = new Button("Choose Parent Directory");
         nameBox.getChildren().add(directButton);
 
@@ -215,6 +218,12 @@ public class NewDialog extends Stage {
      */
     public String getSelection() {
         return selection;
+    }
+    public String getName() {
+        if(name.equals("")) {
+            return "[](no name)";
+        }
+        return name;
     }
 
     /**

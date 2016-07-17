@@ -72,7 +72,7 @@ public class DataManager implements AppDataComponent {
     }
     public boolean hasFlags() {
         for (int i = 0; i < data.size(); i++) {
-            if (data.get(i).getFlagPath() == "") {
+            if (data.get(i).getFlagPath().equals("")) {
                 return false;
             }
         }

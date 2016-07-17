@@ -104,7 +104,7 @@ public class FileManager implements AppFileComponent {
     public void loadData(AppDataComponent data, String filePath) throws IOException {
 
         DataManager dataManager = (DataManager) data;
-        dataManager.reset();
+
         //load JSON
         JsonObject json = loadJSONFile(filePath);
         JsonArray jsonItemArray = json.getJsonArray("SUBREGIONS");
@@ -124,10 +124,10 @@ public class FileManager implements AppFileComponent {
                 RegionItem item = loadItem(jsonRegion);
                 dataManager.addItem(item);
             }
-            Platform.runLater(() -> dataManager.setProgress(prog));
+            dataManager.setProgress(prog);
         }
 
-        Platform.runLater(() -> dataManager.setProgress(1));
+        dataManager.setProgress(1);
         //   lock.unlock();
         //    }
         //    }.start();
@@ -275,7 +275,6 @@ public class FileManager implements AppFileComponent {
                 .add("subregions_have_capitals", manager.hasCapitals())
                 .add("subregions_have_flags", manager.hasFlags())
                 .add("subregions_have_leaders", manager.hasLeaders())
-                
                 .add("subregions", subregionArray).build();
 
         //output the file

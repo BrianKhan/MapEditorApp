@@ -14,6 +14,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 import javafx.stage.Stage;
+import properties_manager.PropertiesManager;
+
 import rgvm.RegioVincoMapEditor;
 import rgvm.data.DataManager;
 import rgvm.data.RegionItem;
@@ -25,6 +27,7 @@ import rgvm.gui.Workspace;
 import static saf.settings.AppPropertyType.LOAD_WORK_TITLE;
 import static saf.settings.AppStartupConstants.PATH_RAW_FILES;
 import static saf.settings.AppStartupConstants.PATH_WORK;
+import saf.ui.AppMessageDialogSingleton;
 
 /**
  *
@@ -50,11 +53,22 @@ public class MapEditorController {
         myDiag.show();
     }
 
-    public void processNewButton() {
+    public void processNewButton(RegioVincoMapEditor app) {
+        //TODO string literals
         NewDialog myDiag = NewDialog.getSingleton();
         Stage newStage = new Stage();
         myDiag.init(newStage);
-        myDiag.show();
+        myDiag.show("New Map");
+        System.out.println(myDiag.getSelection());
+        if (myDiag.getSelection().equals("yes")) {
+
+            System.out.println(myDiag.getName());
+            if (myDiag.getName().equals("[](no name)") || myDiag.getName().equals("")) {
+                System.out.println("iran");
+                AppMessageDialogSingleton single = AppMessageDialogSingleton.getSingleton();
+                single.show("no name", "Please type in a name");
+            }
+        }
     }
 
     public void processSaveTest(RegioVincoMapEditor app) {
@@ -151,8 +165,7 @@ public class MapEditorController {
         System.out.println("Loading in new RVME file");
         processLoadBig(app);
         DataManager dm = (DataManager) app.getDataComponent();
-        System.out.println("Current values: 'background color'= " +dm.getBackgroundColor() + " 'big flag path'= " +dm.getBigFlagPath() + " 'border color'= " +dm.getBorderColor() + " 'height'= " +dm.getHeight() + " 'zoom'= " +dm.getZoom() + " 'raw path value'= " +dm.getRawPath());
-        
+        System.out.println("Current values: 'background color'= " + dm.getBackgroundColor() + " 'big flag path'= " + dm.getBigFlagPath() + " 'border color'= " + dm.getBorderColor() + " 'height'= " + dm.getHeight() + " 'zoom'= " + dm.getZoom() + " 'raw path value'= " + dm.getRawPath());
 
     }
 
@@ -164,6 +177,7 @@ public class MapEditorController {
         fc.setTitle("Raw Map File JSON");
         File selectedFile = fc.showOpenDialog(app.getGUI().getWindow());
         try {
+            app.getDataComponent().reset();
             app.getFileComponent().loadData(app.getDataComponent(), selectedFile.getAbsolutePath());
             DataManager dm = (DataManager) app.getDataComponent();
             dm.setBackgroundColor(010101);
@@ -177,7 +191,7 @@ public class MapEditorController {
             dm.setThickness(2.0);
             dm.setWidth(1000);
             dm.setZoom(2.0);
-            System.out.println(dm.getItems().size());
+
             for (RegionItem myit : dm.getItems()) {
                 myit.setBlue((int) (Math.random() * 0x1000000));
                 myit.setRed((int) (Math.random() * 0x1000000));
@@ -196,7 +210,7 @@ public class MapEditorController {
             System.out.println("errors");
         }
         Workspace work = (Workspace) app.getWorkspaceComponent();
-        work.polyLoad();
+        work.reloadWorkspace();
     }
 
 }

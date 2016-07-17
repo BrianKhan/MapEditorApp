@@ -6,6 +6,8 @@
 package rgvm.gui;
 
 import java.util.ArrayList;
+import javafx.geometry.Insets;
+import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -17,8 +19,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Polygon;
 import javafx.scene.transform.Scale;
@@ -33,7 +38,6 @@ import static saf.settings.AppStartupConstants.FILE_PROTOCOL;
 import static saf.settings.AppStartupConstants.PATH_IMAGES;
 import static saf.settings.AppPropertyType.*;
 import saf.ui.AppGUI;
-
 
 /**
  *
@@ -57,6 +61,8 @@ public class Workspace extends AppWorkspaceComponent {
     Pane first;
     Pane second;
     ProgressBar pb;
+    boolean loaded;
+    Group polyGroup;
 
     public Workspace(RegioVincoMapEditor initApp) {
         app = initApp;
@@ -70,11 +76,11 @@ public class Workspace extends AppWorkspaceComponent {
         pb = new ProgressBar(0);
         progPane.getChildren().add(progress);
         progPane.getChildren().add(pb);
+        polyGroup = new Group();
 
     }
 
     public ProgressBar getPB() {
-
         return pb;
     }
 
@@ -85,13 +91,6 @@ public class Workspace extends AppWorkspaceComponent {
         workspace.getItems().addAll(first, second);
         ImageView img = new ImageView();
         PropertiesManager props = PropertiesManager.getPropertiesManager();
-
-        // dummy image
-        String imagePath = FILE_PROTOCOL + PATH_IMAGES + props.getProperty(IMAGE_TEST.toString());
-        Image holder = new Image(imagePath);
-        img.setImage(holder);
-        first.getChildren().add(img);
-
         itemsTable = new TableView();
 
         nameColumn = new TableColumn(props.getProperty(PropertyType.NAME_COLUMN_HEADING));
@@ -106,8 +105,6 @@ public class Workspace extends AppWorkspaceComponent {
         itemsTable.getColumns().add(capitalColumn);
 
         DataManager dataManager = (DataManager) app.getDataComponent();
-        RegionItem dummy = new RegionItem("test name", "test leader", "test capital");
-        dataManager.addItem(dummy);
         itemsTable.setItems(dataManager.getItems());
         second.getChildren().add(itemsTable);
         itemsTable.minWidthProperty().bind(app.getGUI().getWindow().widthProperty().multiply(.5));
@@ -125,11 +122,12 @@ public class Workspace extends AppWorkspaceComponent {
             controller.processColorButton();
         });
         gui.getNewButton().setOnMouseClicked(e -> {
-            controller.processNewButton();
+            controller.processNewButton(app);
         });
         Button testLoad = new Button("Load RAW Json(To be done for save testing)");
         gui.getFreePane().getChildren().add(testLoad);
         testLoad.setOnMouseClicked(e -> {
+            first.getChildren().clear();
             controller.processLoadTest(app);
         });
         Button testSave = new Button("Save to RVME with current RVM file loaded +hard coded values");
@@ -151,7 +149,7 @@ public class Workspace extends AppWorkspaceComponent {
         gui.getFreePane().getChildren().add(testJunit);
         testJunit.setOnMouseClicked(e -> {
             controller.test(app);
-        }); 
+        });
         itemsTable.setOnMouseClicked(e -> {
 
             if (e.getClickCount() == 2) {
@@ -203,22 +201,28 @@ public class Workspace extends AppWorkspaceComponent {
             myGon.setStrokeWidth(.01);
             first.getChildren().add(myGon);
             //blue ocean
-            first.getScene().setFill(Paint.valueOf("#add8e6"));
-            app.getGUI().getPrimaryScene().setFill(Paint.valueOf("#add8e6"));
+            first.getParent().setStyle("-fx-background-color: #99d6ff;");
+            
+            
         }
     }
 
     @Override
     public void reloadWorkspace() {
         DataManager dataManager = (DataManager) app.getDataComponent();
-        // first.getTransforms().clear();
-        // first.getChildren().clear();
+         first.getTransforms().clear();
+         first.getChildren().clear();
         counterZoom = 0;
         counterRight = 0;
         counterUp = 0;
         debug = 0;
         xloc = 0;
         yloc = 0;
+        layoutMap();
+        fixLayout();
 
+    }
+    public void center() {
+        
     }
 }

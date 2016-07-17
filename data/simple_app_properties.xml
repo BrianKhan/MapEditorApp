@@ -28,6 +28,8 @@
         <property name="IMAGE_TEST"             value="Test.png"></property>
         <property name="LEADER_PATH"            value="Leader.png"></property>
         <property name="FLAG_PATH"              value="Flag.png"></property>
+        <property name="BORDER_COLOR"           value="Border.png"></property>
+        <property name="REMOVE"                 value="Remove.png"></property>
         
         <!-- TOOLTIPS FOR BUTTONS -->
         <property name="NEW_TOOLTIP"		value="Create new project"></property>
@@ -43,6 +45,8 @@
         <property name="ZOOM_TOOLTIP"           value="Zoom"></property>
         <property name="PLAY_TOOLTIP"           value="Play the anthem"></property>
         <property name="PAUSE_TOOLTIP"          value="Pause the anthem"></property>
+        <property name="BORDER_COLOR_TOOLTIP"   value="Select Border Color"></property>
+        <property name="REMOVE_TOOLTIP"                 value="Remove selected"></property>
 
         
         <!-- ERROR MESSAGES -->

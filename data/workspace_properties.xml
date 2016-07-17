@@ -25,6 +25,7 @@
     <property name="LEADER"                     value="Leader: "></property>
     <property name="CAPITAL"                    value="Capital: "></property>
     <property name="COLOR"                      value="Color: "> </property>
+    
 
     </property_list>
     <property_options_list>
