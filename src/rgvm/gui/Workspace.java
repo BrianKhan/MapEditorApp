@@ -7,7 +7,6 @@ package rgvm.gui;
 
 import java.util.ArrayList;
 import javafx.geometry.Insets;
-import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -17,12 +16,16 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Polygon;
@@ -62,9 +65,13 @@ public class Workspace extends AppWorkspaceComponent {
     Pane second;
     ProgressBar pb;
     boolean loaded;
-    Group polyGroup;
-
+    double lowest;
+    double highest;
+    double zoom;
+    Pane firstParent;
     public Workspace(RegioVincoMapEditor initApp) {
+        lowest = 0;
+        highest = 0;
         app = initApp;
         gui = app.getGUI();
         layoutGUI();
@@ -76,7 +83,6 @@ public class Workspace extends AppWorkspaceComponent {
         pb = new ProgressBar(0);
         progPane.getChildren().add(progress);
         progPane.getChildren().add(pb);
-        polyGroup = new Group();
 
     }
 
@@ -86,9 +92,12 @@ public class Workspace extends AppWorkspaceComponent {
 
     public void layoutGUI() {
         workspace = new SplitPane();
+        firstParent = new Pane();
         first = new Pane();
-        second = new Pane();
-        workspace.getItems().addAll(first, second);
+        second = new FlowPane();
+        firstParent.getChildren().add(first);
+
+        workspace.getItems().addAll(firstParent, second);
         ImageView img = new ImageView();
         PropertiesManager props = PropertiesManager.getPropertiesManager();
         itemsTable = new TableView();
@@ -107,7 +116,7 @@ public class Workspace extends AppWorkspaceComponent {
         DataManager dataManager = (DataManager) app.getDataComponent();
         itemsTable.setItems(dataManager.getItems());
         second.getChildren().add(itemsTable);
-        itemsTable.minWidthProperty().bind(app.getGUI().getWindow().widthProperty().multiply(.5));
+        itemsTable.minWidthProperty().bind(app.getGUI().getWindow().widthProperty().multiply(.1));
         itemsTable.minHeightProperty().bind(app.getGUI().getWindow().heightProperty().multiply(.9));
     }
 
@@ -150,6 +159,54 @@ public class Workspace extends AppWorkspaceComponent {
         testJunit.setOnMouseClicked(e -> {
             controller.test(app);
         });
+        first.setOnMouseClicked(e -> {
+            first.requestFocus();
+            System.out.println("X: " + e.getX() + "Y: " + e.getY());
+            System.out.println("Width: " + itemsTable.getWidth());
+
+        });
+        gui.getAppPane().setOnKeyPressed(e -> {
+            if (e.getCode().equals(KeyCode.RIGHT)) {
+                moveRight();
+            }
+            if (e.getCode().equals(KeyCode.LEFT)) {
+                moveLeft();
+            }
+            if (e.getCode().equals(KeyCode.UP)) {
+                moveUp();
+            }
+            if (e.getCode().equals(KeyCode.DOWN)) {
+                moveDown();
+            }
+        });
+        itemsTable.setOnKeyPressed(e -> {
+            itemsTable.getSelectionModel().clearSelection();
+            if (e.getCode().equals(KeyCode.RIGHT)) {
+                moveRight();
+            }
+            if (e.getCode().equals(KeyCode.LEFT)) {
+                moveLeft();
+            }
+            if (e.getCode().equals(KeyCode.UP)) {
+                moveUp();
+            }
+            if (e.getCode().equals(KeyCode.DOWN)) {
+                moveDown();
+            }
+        });
+        firstParent.setOnMouseClicked(e-> {
+            System.out.println("firstparent X: " +e.getX() + " Y: " + e.getY());
+        });
+        first.setOnMouseClicked(e -> {
+            if (e.getButton().equals(MouseButton.PRIMARY)) {
+                System.out.println("X: " +e.getX() + " Y: "+ e.getY());
+                zoomIn(e);
+            }
+            if (e.getButton().equals(MouseButton.SECONDARY)) {
+
+                zoomOut();
+            }
+        });
         itemsTable.setOnMouseClicked(e -> {
 
             if (e.getClickCount() == 2) {
@@ -177,8 +234,10 @@ public class Workspace extends AppWorkspaceComponent {
     public void fixLayout() {
         // apply layout functions based on size
         Scale scale = new Scale();
-        scale.setX(5.3);
-        scale.setY(-5.3);
+        zoom = 5.3;//*(360/(highest-lowest));
+        System.out.println(zoom);
+        scale.setX(zoom);
+        scale.setY(-zoom);
         first.getTransforms().add(scale);
         first.setTranslateX(-10 + app.getGUI().getWindow().getWidth() / 2);
         first.setTranslateY(6 + app.getGUI().getWindow().getHeight() / 2);
@@ -193,7 +252,16 @@ public class Workspace extends AppWorkspaceComponent {
             Polygon myGon = new Polygon();
             for (int j = 0; j < listy.size(); j++) {
                 Double[] myAr = listy.get(j);
+                if (myAr[0] > highest) {
+                    highest = myAr[0];
+                }
+                if (myAr[0] < lowest) {
+                    lowest = myAr[0];
+                }
                 myGon.getPoints().addAll(myAr);
+                myGon.setOnMouseClicked(e-> {
+                    System.out.println("polygon clicked");
+                });
             }
             //green fill, black outline
             myGon.setFill(Paint.valueOf("#21FF42"));
@@ -201,28 +269,90 @@ public class Workspace extends AppWorkspaceComponent {
             myGon.setStrokeWidth(.01);
             first.getChildren().add(myGon);
             //blue ocean
-            first.getParent().setStyle("-fx-background-color: #99d6ff;");
+            // first.getParent().setStyle("-fx-background-color: #99d6ff;");
+            first.setStyle("-fx-background-color: #99d6ff;");
             
-            
+
         }
     }
 
     @Override
     public void reloadWorkspace() {
         DataManager dataManager = (DataManager) app.getDataComponent();
-         first.getTransforms().clear();
-         first.getChildren().clear();
+        first.getTransforms().clear();
+        first.getChildren().clear();
         counterZoom = 0;
         counterRight = 0;
         counterUp = 0;
         debug = 0;
         xloc = 0;
         yloc = 0;
+        lowest = 0;
+        highest = 0;
         layoutMap();
         fixLayout();
 
     }
+
     public void center() {
+
+    }
+
+    public void moveRight() {
+        //simply move the camera 5 pixels to the right
+        counterRight = counterRight + 5;
+        first.setTranslateX(-10 - counterRight + app.getGUI().getWindow().getWidth() / 2);
+
+    }
+
+    public void moveLeft() {
+        //simply move the camera 5 pixels to the left
+        counterRight = counterRight - 5;
+        first.setTranslateX(-10 - counterRight + app.getGUI().getWindow().getWidth() / 2);
+
+    }
+
+    public void moveUp() {
+        //simply move the camera 5 pixels to the up
+        counterUp = counterUp + 5;
+        first.setTranslateY(6 + counterUp + app.getGUI().getWindow().getHeight() / 2);
+    }
+
+    public void moveDown() {
+        //simply move the camera 5 pixels to the down
+        counterUp = counterUp - 5;
+        first.setTranslateY(6 + counterUp + app.getGUI().getWindow().getHeight() / 2);
+    }
+
+    public void zoomIn(MouseEvent e) {
+        /* //we grab the xlocation and ylocation in reference to our "center"
+        xloc = (int) (e.getX() - app.getGUI().getWindow().getWidth() / 2);
+        yloc = (int) (e.getY() - app.getGUI().getWindow().getHeight() / 2);
+        //we move the screen to the clicked location
+        counterRight = counterRight + xloc;
+        counterUp = counterUp - yloc;
+        first.setTranslateX(-10 - counterRight + app.getGUI().getWindow().getWidth() / 2);
+        first.setTranslateY(6 + counterUp + app.getGUI().getWindow().getHeight() / 2); */
+        //we remove all zoom effects, and then apply a new zoom based on counterzoom
+        first.getTransforms().clear();
+        Scale scale = new Scale();
+        //we increment counterZoom every time we zoom
+        counterZoom++;
         
+        scale.setX(zoom + (counterZoom * .7));
+        scale.setY(-zoom - (counterZoom * .7));
+        first.getTransforms().add(scale);
+        System.out.println("zooming in");
+    }
+
+    public void zoomOut() {
+        //siimilar to zoomIn(), but we don't move the camera, and we decrement counterZoom
+        System.out.println("zooming out" +zoom);
+        first.getTransforms().clear();
+        Scale scale = new Scale();
+        counterZoom--;
+        scale.setX(zoom + (counterZoom * .7));
+        scale.setY(-zoom - (counterZoom * .7));
+        first.getTransforms().add(scale);
     }
 }

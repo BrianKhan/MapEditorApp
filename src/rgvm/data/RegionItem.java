@@ -8,6 +8,7 @@ package rgvm.data;
 import java.util.ArrayList;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.shape.Polygon;
 
 /**
  *
@@ -25,6 +26,7 @@ public class RegionItem {
     int green;
     ArrayList<Double[]> myList;
     Double[] tempList;
+    Polygon poly;
 
     public RegionItem(String myName, String myLeader, String myCapital) {
         myList = new ArrayList<Double[]>();
@@ -44,6 +46,9 @@ public class RegionItem {
     public StringProperty nameProperty() {
         return name;
 
+    }
+    public void setPoly(Polygon gon) {
+        poly = gon;
     }
 
     public StringProperty leaderProperty() {

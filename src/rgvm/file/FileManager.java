@@ -66,9 +66,9 @@ public class FileManager implements AppFileComponent {
         System.out.println(json.getJsonNumber("BORDER_THICKNESS"));
         dm.setZoom(json.getJsonNumber("ZOOM").doubleValue());
         System.out.println(json.getJsonNumber("ZOOM"));
-        dm.setBackgroundColor(json.getJsonNumber("BACKGROUND_COLOR").intValue());
+        dm.setBackgroundColor(json.getString("BACKGROUND_COLOR"));
         System.out.println(json.getJsonNumber("BACKGROUND_COLOR"));
-        dm.setBorderColor(json.getJsonNumber("BORDER_COLOR").intValue());
+        dm.setBorderColor(json.getString("BORDER_COLOR"));
         System.out.println(json.getJsonNumber("BORDER_COLOR"));
         dm.setRawPath(json.getString("RAW_PATH"));
         System.out.println(json.getString("RAW_PATH"));

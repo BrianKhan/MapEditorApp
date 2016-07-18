@@ -21,8 +21,8 @@ public class DataManager implements AppDataComponent {
     Double height;
     double borderThickness;
     double zoom;
-    int backgroundColor;
-    int borderColor;
+    String backgroundColor;
+    String borderColor;
     String rawPath;
     String bigFlagPath;
     String sealPath;
@@ -46,8 +46,8 @@ public class DataManager implements AppDataComponent {
         height = null;
         borderThickness = 0;
         zoom = 0;
-        backgroundColor = 0;
-        borderColor = 0;
+        backgroundColor = "#000000";
+        borderColor = "#000000";
         rawPath = null;
         bigFlagPath = null;
         sealPath = null;
@@ -146,19 +146,19 @@ public class DataManager implements AppDataComponent {
         zoom = zom;
     }
 
-    public int getBackgroundColor() {
+    public String getBackgroundColor() {
         return backgroundColor;
     }
 
-    public void setBackgroundColor(int color) {
+    public void setBackgroundColor(String color) {
         backgroundColor = color;
     }
 
-    public int getBorderColor() {
+    public String getBorderColor() {
         return borderColor;
     }
 
-    public void setBorderColor(int color) {
+    public void setBorderColor(String color) {
         borderColor = color;
     }
 

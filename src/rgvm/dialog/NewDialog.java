@@ -5,6 +5,9 @@
  */
 package rgvm.dialog;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -27,6 +30,7 @@ import static saf.components.AppStyleArbiter.CLASS_BORDERED_PANE;
 import static saf.components.AppStyleArbiter.CLASS_SUBHEADING_LABEL;
 import rgvm.PropertyType;
 import rgvm.data.RegionItem;
+import saf.ui.AppMessageDialogSingleton;
 
 /**
  * This class is heavily based on AppYesNoCancelDialogSingleton with changes
@@ -59,7 +63,7 @@ public class NewDialog extends Stage {
 
     Scene messageScene;
 
-    Label parentLabel;
+    Label nameLabel;
     Label leaderLabel;
     Label capitalLabel;
 
@@ -75,6 +79,9 @@ public class NewDialog extends Stage {
     String NO;
     Stage myStage;
     String name;
+    TextField nameField;
+    String parentDirectory;
+    String dataDirectory;
 
     /**
      *
@@ -125,11 +132,12 @@ public class NewDialog extends Stage {
         }
         // LABELS AND TEXT FIELDS
         name = "";
-        parentLabel = new Label(props.getProperty(PropertyType.NAME));
+        nameLabel = new Label(props.getProperty(PropertyType.NAME));
         leaderLabel = new Label(props.getProperty(PropertyType.LEADER));
         capitalLabel = new Label(props.getProperty(PropertyType.CAPITAL));
 
         //css
+        nameLabel.getStyleClass().add(CLASS_SUBHEADING_LABEL);
         leaderLabel.getStyleClass().add(CLASS_SUBHEADING_LABEL);
         capitalLabel.getStyleClass().add(CLASS_SUBHEADING_LABEL);
 
@@ -145,7 +153,8 @@ public class NewDialog extends Stage {
         EventHandler yesNoCancelHandler = (EventHandler<ActionEvent>) (ActionEvent ae) -> {
             Button sourceButton = (Button) ae.getSource();
             NewDialog.this.selection = sourceButton.getText();
-            name = parentField.getText();
+            name = nameField.getText();
+            
             NewDialog.this.hide();
         };
 
@@ -156,10 +165,10 @@ public class NewDialog extends Stage {
         // CATEGORY HBOX
         HBox notherBox = new HBox();
         notherBox.getChildren().add(new Label("Name: "));
-        notherBox.getChildren().add(new TextField());
+        notherBox.getChildren().add(nameField = new TextField());
         
         nameBox = new HBox();
-        
+        //TODO string literals
         nameBox.getChildren().add(new Label("Parent Directory: "));
         nameBox.getChildren().add(parentField = new TextField("Parent Directory"));
         Button directButton = new Button("Choose Parent Directory");
@@ -173,12 +182,39 @@ public class NewDialog extends Stage {
         directButton.setOnMouseClicked(e -> {
             DirectoryChooser directChoose = new DirectoryChooser();
             directChoose.setTitle("Open parent directory");
-            directChoose.showDialog(myStage);
+            File fil = new File(".");
+            directChoose.setInitialDirectory(fil);
+            File dc = directChoose.showDialog(myStage);
+            String s1 = dc.getAbsolutePath();
+            String s2 = fil.getAbsolutePath();
+            try { 
+                
+            parentDirectory = "."+s1.substring( s2.length()-2);
+            }
+            catch (StringIndexOutOfBoundsException exc) {
+                AppMessageDialogSingleton single = AppMessageDialogSingleton.getSingleton();
+                single.show("bad directory", "Please choose a subdirectory within the initially shown folder");
+                this.requestFocus();
+            }
         });
         fileDirect.setOnMouseClicked(e -> {
             FileChooser myChoose = new FileChooser();
             myChoose.setTitle("Open Data File");
-            myChoose.showOpenDialog(myStage);
+            File fil = new File(".");
+       
+            myChoose.setInitialDirectory(fil);
+            File dc = myChoose.showOpenDialog(myStage);
+            String s1 = dc.getAbsolutePath();
+            String s2 = fil.getAbsolutePath();
+            try { 
+                
+            dataDirectory = "."+s1.substring( s2.length()-2);
+            }
+            catch (StringIndexOutOfBoundsException exc) {
+                AppMessageDialogSingleton single = AppMessageDialogSingleton.getSingleton();
+                single.show("bad directory", "Please choose a subdirectory within the initially shown folder");
+                this.requestFocus();
+            }
         });
 
         // END HBOX
@@ -224,6 +260,12 @@ public class NewDialog extends Stage {
             return "[](no name)";
         }
         return name;
+    }
+    public String getParentDirectory() {
+        return  parentDirectory;
+    }
+    public String getDataDirectory() {
+        return dataDirectory;
     }
 
     /**

@@ -58,20 +58,69 @@ public class MapEditorController {
         NewDialog myDiag = NewDialog.getSingleton();
         Stage newStage = new Stage();
         myDiag.init(newStage);
+
         myDiag.show("New Map");
         System.out.println(myDiag.getSelection());
-        if (myDiag.getSelection().equals("yes")) {
+        if (myDiag.getSelection().equalsIgnoreCase("yes")) {
+            if (myDiag.getName().equals("[](no name)") || myDiag.getName().equals("") || myDiag.getParentDirectory() == null || myDiag.getDataDirectory() == null) {
 
-            System.out.println(myDiag.getName());
-            if (myDiag.getName().equals("[](no name)") || myDiag.getName().equals("")) {
-                System.out.println("iran");
                 AppMessageDialogSingleton single = AppMessageDialogSingleton.getSingleton();
-                single.show("no name", "Please type in a name");
+                single.show("error", "Please fill out all fields");
+            } else {
+                app.getDataComponent().reset();
+                DataManager dm = (DataManager) app.getDataComponent();
+                dm.setName(myDiag.getName());
+                dm.setParent(myDiag.getParentDirectory());
+                dm.setRawPath(myDiag.getDataDirectory());
+                System.out.println("PD: " + myDiag.getParentDirectory());
+                System.out.println("DD: " + myDiag.getDataDirectory());
+                try {
+                    processLoadNew(app);
+                } catch (IOException ex) {
+                    AppMessageDialogSingleton single = AppMessageDialogSingleton.getSingleton();
+                    single.show("error loading data", "error loading data");
+                }
+
+                app.getWorkspaceComponent().reloadWorkspace();
             }
         }
     }
 
-    public void processSaveTest(RegioVincoMapEditor app) {
+    public void processLoadNew(RegioVincoMapEditor app) throws IOException {
+        DataManager dm = (DataManager) app.getDataComponent();
+        //TODO make sure loaddata works with relative path
+        app.getFileComponent().loadData(app.getDataComponent(), dm.getRawPath());
+        dm.setBackgroundColor("#99d6ff");
+        dm.setBigFlagPath(dm.getParent()+dm.getName()+".png");
+        System.out.println("Flag path: " + dm.getBigFlagPath());
+        dm.setBorderColor("#000000");
+        dm.setHeight(536);
+        dm.setSealPath("seal path value");
+        dm.setThickness(2.0);
+        dm.setWidth(802);
+        dm.setZoom(2.0);
+
+        for (RegionItem myit : dm.getItems()) {
+            myit.setBlue((int) (Math.random() * 0x1000000));
+            myit.setRed((int) (Math.random() * 0x1000000));
+            myit.setGreen((int) (Math.random() * 0x1000000));
+            myit.setCapital("Capital value");
+            myit.setFlagPath("FLAG_PATH_VALUE");
+            myit.setLeader("LEADER  VALUE");
+            myit.setLeaderPath("LEADER_PATH_VALUE");
+            myit.setName("NAME VALUE");
+            for (Double[] myar : myit.getList()) {
+                //    System.out.println("X: " + myar[0]);
+                //    System.out.println("Y: " + myar[1]);
+            }
+
+        
+        Workspace work = (Workspace) app.getWorkspaceComponent();
+        work.reloadWorkspace();
+    }
+}
+
+public void processSaveTest(RegioVincoMapEditor app) {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File(PATH_WORK));
         fc.setTitle("Save Work to File");
@@ -130,9 +179,9 @@ public class MapEditorController {
         try {
             app.getFileComponent().loadData(app.getDataComponent(), selectedFile.getAbsolutePath());
             DataManager dm = (DataManager) app.getDataComponent();
-            dm.setBackgroundColor(010101);
+            dm.setBackgroundColor("#010101");
             dm.setBigFlagPath("Big flag path");
-            dm.setBorderColor(101010);
+            dm.setBorderColor("#101010");
             dm.setHeight(1000);
             dm.setName("name value");
             dm.setParent("Parent directory value");
@@ -180,9 +229,9 @@ public class MapEditorController {
             app.getDataComponent().reset();
             app.getFileComponent().loadData(app.getDataComponent(), selectedFile.getAbsolutePath());
             DataManager dm = (DataManager) app.getDataComponent();
-            dm.setBackgroundColor(010101);
+            dm.setBackgroundColor("#010101");
             dm.setBigFlagPath("Big flag path");
-            dm.setBorderColor(101010);
+            dm.setBorderColor("#101010");
             dm.setHeight(1000);
             dm.setName("name value");
             dm.setParent("Parent directory value");
