@@ -14,6 +14,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import properties_manager.PropertiesManager;
 
 import rgvm.RegioVincoMapEditor;
@@ -57,9 +58,11 @@ public class MapEditorController {
         //TODO string literals
         NewDialog myDiag = NewDialog.getSingleton();
         Stage newStage = new Stage();
+        
         myDiag.init(newStage);
 
         myDiag.show("New Map");
+        
         System.out.println(myDiag.getSelection());
         if (myDiag.getSelection().equalsIgnoreCase("yes")) {
             if (myDiag.getName().equals("[](no name)") || myDiag.getName().equals("") || myDiag.getParentDirectory() == null || myDiag.getDataDirectory() == null) {
@@ -67,11 +70,13 @@ public class MapEditorController {
                 AppMessageDialogSingleton single = AppMessageDialogSingleton.getSingleton();
                 single.show("error", "Please fill out all fields");
             } else {
+                Workspace work = (Workspace) app.getWorkspaceComponent();
                 app.getDataComponent().reset();
                 DataManager dm = (DataManager) app.getDataComponent();
                 dm.setName(myDiag.getName());
                 dm.setParent(myDiag.getParentDirectory());
                 dm.setRawPath(myDiag.getDataDirectory());
+                System.out.println("Name: " +dm.getName());
                 System.out.println("PD: " + myDiag.getParentDirectory());
                 System.out.println("DD: " + myDiag.getDataDirectory());
                 try {
@@ -80,7 +85,23 @@ public class MapEditorController {
                     AppMessageDialogSingleton single = AppMessageDialogSingleton.getSingleton();
                     single.show("error loading data", "error loading data");
                 }
-
+                app.getGUI().getColorButton().setDisable(false);
+                app.getGUI().getSaveButton().setDisable(false);
+                app.getGUI().getExportButton().setDisable(false);
+                app.getGUI().getRenameButton().setDisable(false);
+                app.getGUI().getAddButton().setDisable(false);
+               // app.getGUI().getRemoveButton().setDisable(false);
+                app.getGUI().getBackgroundButton().setDisable(false);
+                app.getGUI().getBorderColorButton().setDisable(false);
+                String anthemPath = dm.getParent()+"/"+dm.getName()+" National Anthem.mid";
+                File anthemFile = new File(anthemPath);
+                if(anthemFile.exists()) {
+                    System.out.println("Found anthem file: " +anthemPath);
+                    app.getGUI().getPlayButton().setDisable(false);
+                }
+                else { 
+                    System.out.println("Did not find anthem file: " +anthemPath);
+                }
                 app.getWorkspaceComponent().reloadWorkspace();
             }
         }
@@ -91,7 +112,7 @@ public class MapEditorController {
         //TODO make sure loaddata works with relative path
         app.getFileComponent().loadData(app.getDataComponent(), dm.getRawPath());
         dm.setBackgroundColor("#99d6ff");
-        dm.setBigFlagPath(dm.getParent()+dm.getName()+" Flag.png");
+        dm.setBigFlagPath(dm.getParent()+"/"+dm.getName()+" Flag.png");
         System.out.println("Flag path: " + dm.getBigFlagPath());
         dm.setBorderColor("#000000");
         dm.setHeight(536);

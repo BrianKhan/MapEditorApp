@@ -24,6 +24,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
+import javafx.stage.StageStyle;
 import properties_manager.PropertiesManager;
 import saf.components.AppStyleArbiter;
 import static saf.components.AppStyleArbiter.CLASS_BORDERED_PANE;
@@ -125,6 +126,7 @@ public class NewDialog extends Stage {
         // CHANGED SO THAT WE ONLY SET THIS WINDOW MODAL ONCE, AS WE 
         // CAN ONLY INITIALIZE IN OUR WORKSPACE CLASS EACH TIME WE HIT THE BUTTON
         myStage = primaryStage;
+        
         if (primaryStage.getModality().toString() != "NONE") {
 
             initModality(Modality.WINDOW_MODAL);
@@ -219,6 +221,10 @@ public class NewDialog extends Stage {
                 single.show("bad directory", "Please choose a subdirectory within the initially shown folder");
                 this.requestFocus();
             }
+        });
+        myStage.setOnCloseRequest(e-> {
+            selection = "no";
+            this.hide();
         });
 
         // END HBOX
