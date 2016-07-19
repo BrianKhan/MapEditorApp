@@ -102,6 +102,11 @@ public class MapEditorController {
                 else { 
                     System.out.println("Did not find anthem file: " +anthemPath);
                 }
+                app.getGUI().getZoomSlider().setDisable(false);
+                app.getGUI().getZoomSlider().setValue(0);
+                app.getGUI().getThickness().setDisable(false);
+                app.getGUI().getThickness().setValue(0);
+                app.getGUI().getReassignButton().setDisable(false);
                 app.getWorkspaceComponent().reloadWorkspace();
             }
         }

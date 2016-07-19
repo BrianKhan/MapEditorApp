@@ -30,6 +30,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Polygon;
 import javafx.scene.transform.Scale;
+import javafx.stage.Stage;
 import properties_manager.PropertiesManager;
 import rgvm.PropertyType;
 import saf.components.AppWorkspaceComponent;
@@ -37,6 +38,7 @@ import rgvm.RegioVincoMapEditor;
 import rgvm.controller.MapEditorController;
 import rgvm.data.DataManager;
 import rgvm.data.RegionItem;
+import rgvm.dialog.renameDialog;
 import static saf.settings.AppStartupConstants.FILE_PROTOCOL;
 import static saf.settings.AppStartupConstants.PATH_IMAGES;
 import static saf.settings.AppPropertyType.*;
@@ -154,6 +156,18 @@ public class Workspace extends AppWorkspaceComponent {
         gui.getFreePane().getChildren().add(testExport);
         testExport.setOnMouseClicked(e -> {
             controller.processExportTest(app);
+        });
+        gui.getRenameButton().setOnMouseClicked(e-> {
+            renameDialog myDiag = renameDialog.getSingleton();
+        Stage newStage = new Stage();
+        DataManager dm = (DataManager)app.getDataComponent();
+        myDiag.init(newStage, dm.getName());
+
+        myDiag.show("Rename Map");
+        if (myDiag.getSelection().equalsIgnoreCase("yes")) {
+            dm.setName(myDiag.getRename());
+            System.out.println("new name = " + dm.getName());
+        }
         });
         Button testJunit = new Button("Choose file and execute test");
         gui.getFreePane().getChildren().add(testJunit);
