@@ -59,6 +59,9 @@ public class RegionItem {
         return capital;
 
     }
+    public Polygon getPoly() {
+        return poly;
+    }
 
     public void add(double x, double y) {
         tempList = new Double[2];

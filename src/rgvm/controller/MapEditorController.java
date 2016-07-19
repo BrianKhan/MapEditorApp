@@ -91,33 +91,28 @@ public class MapEditorController {
         //TODO make sure loaddata works with relative path
         app.getFileComponent().loadData(app.getDataComponent(), dm.getRawPath());
         dm.setBackgroundColor("#99d6ff");
-        dm.setBigFlagPath(dm.getParent()+dm.getName()+".png");
+        dm.setBigFlagPath(dm.getParent()+dm.getName()+" Flag.png");
         System.out.println("Flag path: " + dm.getBigFlagPath());
         dm.setBorderColor("#000000");
         dm.setHeight(536);
-        dm.setSealPath("seal path value");
-        dm.setThickness(2.0);
+        dm.setSealPath(dm.getParent()+dm.getName()+" Seal.png");
+        dm.setThickness(1.0);
         dm.setWidth(802);
-        dm.setZoom(2.0);
+        dm.setZoom(1.0);
 
         for (RegionItem myit : dm.getItems()) {
-            myit.setBlue((int) (Math.random() * 0x1000000));
-            myit.setRed((int) (Math.random() * 0x1000000));
-            myit.setGreen((int) (Math.random() * 0x1000000));
-            myit.setCapital("Capital value");
-            myit.setFlagPath("FLAG_PATH_VALUE");
-            myit.setLeader("LEADER  VALUE");
-            myit.setLeaderPath("LEADER_PATH_VALUE");
-            myit.setName("NAME VALUE");
-            for (Double[] myar : myit.getList()) {
-                //    System.out.println("X: " + myar[0]);
-                //    System.out.println("Y: " + myar[1]);
-            }
-
+            myit.setBlue(0);
+            myit.setRed(0);
+            myit.setGreen(256);
+            myit.setCapital("[](no capital)");
+            myit.setFlagPath("[](no flag path)");
+            myit.setLeader("[](no leader)");
+            myit.setLeaderPath("[](no leader path)");
+            myit.setName("[](no name)");
         
+    }
         Workspace work = (Workspace) app.getWorkspaceComponent();
         work.reloadWorkspace();
-    }
 }
 
 public void processSaveTest(RegioVincoMapEditor app) {

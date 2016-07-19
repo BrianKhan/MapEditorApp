@@ -82,6 +82,7 @@ public class NewDialog extends Stage {
     TextField nameField;
     String parentDirectory;
     String dataDirectory;
+    TextField fileField;
 
     /**
      *
@@ -176,7 +177,7 @@ public class NewDialog extends Stage {
 
         HBox dataBox = new HBox();
         dataBox.getChildren().add(new Label("Data File: "));
-        dataBox.getChildren().add(new TextField("Data Directory"));
+        dataBox.getChildren().add(fileField = new TextField("Data Directory"));
         Button fileDirect = new Button("Choose File");
         dataBox.getChildren().add(fileDirect);
         directButton.setOnMouseClicked(e -> {
@@ -190,6 +191,7 @@ public class NewDialog extends Stage {
             try { 
                 
             parentDirectory = "."+s1.substring( s2.length()-2);
+            parentField.setText(parentDirectory);
             }
             catch (StringIndexOutOfBoundsException exc) {
                 AppMessageDialogSingleton single = AppMessageDialogSingleton.getSingleton();
@@ -201,14 +203,16 @@ public class NewDialog extends Stage {
             FileChooser myChoose = new FileChooser();
             myChoose.setTitle("Open Data File");
             File fil = new File(".");
-       
+            
             myChoose.setInitialDirectory(fil);
             File dc = myChoose.showOpenDialog(myStage);
             String s1 = dc.getAbsolutePath();
             String s2 = fil.getAbsolutePath();
+            
             try { 
                 
             dataDirectory = "."+s1.substring( s2.length()-2);
+            fileField.setText(dataDirectory);
             }
             catch (StringIndexOutOfBoundsException exc) {
                 AppMessageDialogSingleton single = AppMessageDialogSingleton.getSingleton();

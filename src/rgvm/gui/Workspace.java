@@ -69,6 +69,7 @@ public class Workspace extends AppWorkspaceComponent {
     double highest;
     double zoom;
     Pane firstParent;
+
     public Workspace(RegioVincoMapEditor initApp) {
         lowest = 0;
         highest = 0;
@@ -194,12 +195,12 @@ public class Workspace extends AppWorkspaceComponent {
                 moveDown();
             }
         });
-        firstParent.setOnMouseClicked(e-> {
-            System.out.println("firstparent X: " +e.getX() + " Y: " + e.getY());
+        firstParent.setOnMouseClicked(e -> {
+            System.out.println("firstparent X: " + e.getX() + " Y: " + e.getY());
         });
         first.setOnMouseClicked(e -> {
             if (e.getButton().equals(MouseButton.PRIMARY)) {
-                System.out.println("X: " +e.getX() + " Y: "+ e.getY());
+                System.out.println("X: " + e.getX() + " Y: " + e.getY());
                 zoomIn(e);
             }
             if (e.getButton().equals(MouseButton.SECONDARY)) {
@@ -259,10 +260,19 @@ public class Workspace extends AppWorkspaceComponent {
                     lowest = myAr[0];
                 }
                 myGon.getPoints().addAll(myAr);
-                myGon.setOnMouseClicked(e-> {
-                    System.out.println("polygon clicked");
-                });
+
             }
+            dataManager.getItems().get(i).setPoly(myGon);
+            myGon.setOnMouseClicked(e -> {
+                for (int j = 0; j < dataManager.getItems().size(); j++) {
+                    if (dataManager.getItems().get(j).getPoly().equals(myGon)) {
+                        itemsTable.getSelectionModel().select(dataManager.getItems().get(j));
+                        System.out.println("polygon clicked");
+                    }
+
+                }
+
+            });
             //green fill, black outline
             myGon.setFill(Paint.valueOf("#21FF42"));
             myGon.setStroke(Paint.valueOf("#000000"));
@@ -271,7 +281,6 @@ public class Workspace extends AppWorkspaceComponent {
             //blue ocean
             // first.getParent().setStyle("-fx-background-color: #99d6ff;");
             first.setStyle("-fx-background-color: #99d6ff;");
-            
 
         }
     }
@@ -338,7 +347,7 @@ public class Workspace extends AppWorkspaceComponent {
         Scale scale = new Scale();
         //we increment counterZoom every time we zoom
         counterZoom++;
-        
+
         scale.setX(zoom + (counterZoom * .7));
         scale.setY(-zoom - (counterZoom * .7));
         first.getTransforms().add(scale);
@@ -347,7 +356,7 @@ public class Workspace extends AppWorkspaceComponent {
 
     public void zoomOut() {
         //siimilar to zoomIn(), but we don't move the camera, and we decrement counterZoom
-        System.out.println("zooming out" +zoom);
+        System.out.println("zooming out" + zoom);
         first.getTransforms().clear();
         Scale scale = new Scale();
         counterZoom--;
