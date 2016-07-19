@@ -5,8 +5,14 @@
  */
 package rgvm.gui;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -16,7 +22,9 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
@@ -29,8 +37,10 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
+import javax.imageio.ImageIO;
 import properties_manager.PropertiesManager;
 import rgvm.PropertyType;
 import saf.components.AppWorkspaceComponent;
@@ -67,17 +77,20 @@ public class Workspace extends AppWorkspaceComponent {
     Pane second;
     ProgressBar pb;
     boolean loaded;
-    double lowest;
-    double highest;
+    double lowestX;
+    double lowestY; 
+    double highestY;
+    double highestX;
     double zoom;
     Pane firstParent;
+    
 
     public Workspace(RegioVincoMapEditor initApp) {
-        lowest = 0;
-        highest = 0;
+        
         app = initApp;
         gui = app.getGUI();
         layoutGUI();
+        
         workspace.setDividerPosition(0, .885);
         setupHandlers();
         FlowPane progPane = new FlowPane();
@@ -97,8 +110,13 @@ public class Workspace extends AppWorkspaceComponent {
         workspace = new SplitPane();
         firstParent = new Pane();
         first = new Pane();
+        Rectangle myClip = new Rectangle(802,536);
+        
+        firstParent.setClip(myClip);
+        firstParent.setBackground(new Background( new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
         second = new FlowPane();
         firstParent.getChildren().add(first);
+        
 
         workspace.getItems().addAll(firstParent, second);
         ImageView img = new ImageView();
@@ -157,6 +175,18 @@ public class Workspace extends AppWorkspaceComponent {
         testExport.setOnMouseClicked(e -> {
             controller.processExportTest(app);
         });
+        gui.getThickness().addEventFilter(KeyEvent.ANY,e-> {
+            
+      
+            e.consume();
+            first.requestFocus();
+        });
+        gui.getZoomSlider().addEventFilter(KeyEvent.ANY,e-> {
+            
+      
+            e.consume();
+            first.requestFocus();
+        });
         gui.getRenameButton().setOnMouseClicked(e-> {
             renameDialog myDiag = renameDialog.getSingleton();
         Stage newStage = new Stage();
@@ -166,6 +196,15 @@ public class Workspace extends AppWorkspaceComponent {
         myDiag.show("Rename Map");
         if (myDiag.getSelection().equalsIgnoreCase("yes")) {
             dm.setName(myDiag.getRename());
+            String anthemPath = dm.getParent()+"/"+dm.getName()+" National Anthem.mid";
+                File anthemFile = new File(anthemPath);
+                if(anthemFile.exists()) {
+                    System.out.println("Found anthem file: " +anthemPath);
+                    app.getGUI().getPlayButton().setDisable(false);
+                }
+                else { 
+                    System.out.println("Did not find anthem file: " +anthemPath);
+                }
             System.out.println("new name = " + dm.getName());
         }
         });
@@ -249,13 +288,19 @@ public class Workspace extends AppWorkspaceComponent {
     public void fixLayout() {
         // apply layout functions based on size
         Scale scale = new Scale();
-        zoom = 5.3;//*(360/(highest-lowest));
-        System.out.println(zoom);
+        double diff = highestX-lowestX;
+        zoom = 2.22;//135, 2.22;
+        System.out.println(lowestX);
+        first.setTranslateX(-lowestX*zoom);
+        //first.setTranslateX(((-180-lowestX)*zoom)+180*zoom);
+        
+        //first.setTranslateY(((-9999+highestY)*zoom)+9999*zoom);
+       //this one was good first.setTranslateY((firstParent.getHeight()/2)+highestY*zoom);
+        first.setTranslateY((firstParent.getHeight()/2)+(((highestY-lowestY)/2)*zoom));
         scale.setX(zoom);
         scale.setY(-zoom);
         first.getTransforms().add(scale);
-        first.setTranslateX(-10 + app.getGUI().getWindow().getWidth() / 2);
-        first.setTranslateY(6 + app.getGUI().getWindow().getHeight() / 2);
+        
     }
 
     public void layoutMap() {
@@ -267,11 +312,19 @@ public class Workspace extends AppWorkspaceComponent {
             Polygon myGon = new Polygon();
             for (int j = 0; j < listy.size(); j++) {
                 Double[] myAr = listy.get(j);
-                if (myAr[0] > highest) {
-                    highest = myAr[0];
+                //System.out.println(myAr[0]);
+                if(lowestX > myAr[0]) {
+                    lowestX = myAr[0];
+                    
                 }
-                if (myAr[0] < lowest) {
-                    lowest = myAr[0];
+                if(highestX < myAr[0]) {
+                    highestX = myAr[0];
+                }
+                if(highestY < myAr[1]) {
+                    highestY = myAr[1];
+                }
+                if(lowestY> myAr[1]) {
+                    lowestY = myAr[1];
                 }
                 myGon.getPoints().addAll(myAr);
 
@@ -295,6 +348,17 @@ public class Workspace extends AppWorkspaceComponent {
             //blue ocean
             // first.getParent().setStyle("-fx-background-color: #99d6ff;");
             first.setStyle("-fx-background-color: #99d6ff;");
+       /*     DataManager dm = (DataManager) app.getDataComponent();
+        first.resize(dm.getWidth(), dm.getHeight());
+        firstParent.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
+        WritableImage wi = new WritableImage((int)dm.getWidth(), (int)dm.getHeight());
+        WritableImage snapshot = first.snapshot(new SnapshotParameters(), wi);
+        File output = new File("snapshot" + ".png");
+            try {
+                ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", output);
+            } catch (IOException ex) {
+                System.out.println("Snapshot error");
+            } */
 
         }
     }
@@ -310,8 +374,10 @@ public class Workspace extends AppWorkspaceComponent {
         debug = 0;
         xloc = 0;
         yloc = 0;
-        lowest = 0;
-        highest = 0;
+        lowestX = 900;
+        highestY = -900;
+        lowestY = 900;
+        highestX = 900;
         layoutMap();
         fixLayout();
 
@@ -324,39 +390,39 @@ public class Workspace extends AppWorkspaceComponent {
     public void moveRight() {
         //simply move the camera 5 pixels to the right
         counterRight = counterRight + 5;
-        first.setTranslateX(-10 - counterRight + app.getGUI().getWindow().getWidth() / 2);
+        first.setTranslateX(-10 + first.getTranslateX());
 
     }
 
     public void moveLeft() {
         //simply move the camera 5 pixels to the left
         counterRight = counterRight - 5;
-        first.setTranslateX(-10 - counterRight + app.getGUI().getWindow().getWidth() / 2);
+        first.setTranslateX(10 + first.getTranslateX());
 
     }
 
     public void moveUp() {
         //simply move the camera 5 pixels to the up
         counterUp = counterUp + 5;
-        first.setTranslateY(6 + counterUp + app.getGUI().getWindow().getHeight() / 2);
+        first.setTranslateY(6 + first.getTranslateY());
     }
 
     public void moveDown() {
         //simply move the camera 5 pixels to the down
         counterUp = counterUp - 5;
-        first.setTranslateY(6 + counterUp + app.getGUI().getWindow().getHeight() / 2);
+        first.setTranslateY(-6 + first.getTranslateY());
     }
 
     public void zoomIn(MouseEvent e) {
-        /* //we grab the xlocation and ylocation in reference to our "center"
-        xloc = (int) (e.getX() - app.getGUI().getWindow().getWidth() / 2);
+         //we grab the xlocation and ylocation in reference to our "center"
+       /* xloc = (int) (e.getX() - app.getGUI().getWindow().getWidth() / 2);
         yloc = (int) (e.getY() - app.getGUI().getWindow().getHeight() / 2);
         //we move the screen to the clicked location
         counterRight = counterRight + xloc;
         counterUp = counterUp - yloc;
         first.setTranslateX(-10 - counterRight + app.getGUI().getWindow().getWidth() / 2);
-        first.setTranslateY(6 + counterUp + app.getGUI().getWindow().getHeight() / 2); */
-        //we remove all zoom effects, and then apply a new zoom based on counterzoom
+        first.setTranslateY(6 + counterUp + app.getGUI().getWindow().getHeight() / 2); 
+        //we remove all zoom effects, and then apply a new zoom based on counterzoom */
         first.getTransforms().clear();
         Scale scale = new Scale();
         //we increment counterZoom every time we zoom
