@@ -6,6 +6,7 @@
 package rgvm.dialog;
 
 
+import java.io.File;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -121,7 +122,7 @@ public class EditDialog extends Stage {
      * @param primaryStage The window above which this
      * dialog will be centered.
      */
-    public void init(Stage primaryStage) {
+    public void init(Stage primaryStage, RegionItem item, String regionPath) {
         // MAKE THIS DIALOG MODAL, MEANING OTHERS WILL WAIT
         // FOR IT WHEN IT IS DISPLAYED
         // CHANGED SO THAT WE ONLY SET THIS WINDOW MODAL ONCE, AS WE 
@@ -141,9 +142,9 @@ public class EditDialog extends Stage {
         leaderLabel.getStyleClass().add(CLASS_SUBHEADING_LABEL);
         capitalLabel.getStyleClass().add(CLASS_SUBHEADING_LABEL);
         
-        nameField = new TextField();
-        capitalField = new TextField();
-        leaderField = new TextField();
+        nameField = new TextField(item.getName());
+        capitalField = new TextField(item.getCapital());
+        leaderField = new TextField(item.getLeader());
 
         
         // YES, NO, AND CANCEL BUTTONS
@@ -163,12 +164,14 @@ public class EditDialog extends Stage {
 	// AND THEN REGISTER THEM TO RESPOND TO INTERACTIONS
         yesButton.setOnAction(yesNoCancelHandler);
         noButton.setOnAction(yesNoCancelHandler);
+        leftButton.setOnAction(yesNoCancelHandler);
+        rightButton.setOnAction(yesNoCancelHandler);
       //  cancelButton.setOnAction(yesNoCancelHandler);
         
         // CATEGORY HBOX
         nameBox = new HBox();
         nameBox.getChildren().add(nameLabel);
-        nameBox.getChildren().add(nameField = new TextField());
+        nameBox.getChildren().add(nameField = new TextField(item.getName()));
         
         // DESCRIPTION HBOX
         leaderBox = new HBox();
@@ -181,17 +184,44 @@ public class EditDialog extends Stage {
         capitalBox.getChildren().add(capitalField);
         
         // END HBOX
+        
         imageBox = new HBox();
-        String imagePath = FILE_PROTOCOL + PATH_IMAGES + props.getProperty(LEADER_PATH.toString());
-        ImageView holder = new ImageView(imagePath);
-        holder.setFitHeight(50);
-        holder.setFitWidth(50);
-        String secondPath = FILE_PROTOCOL + PATH_IMAGES + props.getProperty(FLAG_PATH.toString());
-        ImageView holders = new ImageView(secondPath);
-        holders.setFitHeight(50);
-        holders.setFitWidth(100);
-        imageBox.getChildren().add(holder);
-        imageBox.getChildren().add(holders);
+        
+        File leaderImage = new File(item.getLeaderPath());
+        
+                if (leaderImage.exists()) {
+                    
+                    System.out.println("Found leader image in: " +leaderImage.toString());    
+                    Image img = new Image("file:"+item.getLeaderPath());
+                    
+                     ImageView holder = new ImageView();
+                     holder.setFitHeight(50);
+                     holder.setFitWidth(100);
+                     holder.setImage(img);
+                     imageBox.getChildren().add(holder);
+        
+                }
+                
+                else {
+                    
+                    System.out.println("Did not find leader image in: "+leaderImage.toString());
+                }
+                File flagImage = new File(item.getFlagPath());
+                if(flagImage.exists()) {
+                      System.out.println("Found flag image in: " +flagImage.toString());
+                      Image imgs = new Image("file:"+item.getFlagPath());
+                      ImageView holders = new ImageView();
+                      holders.setPreserveRatio(true);
+                      holders.setFitHeight(50);
+                      holders.setFitWidth(100);
+                      holders.setImage(imgs);
+                      imageBox.getChildren().add(holders);
+                }
+                else {
+                    System.out.println("Did not find flag image in: "+flagImage.toString());
+                }
+                
+        
         
         
         
@@ -235,6 +265,15 @@ public class EditDialog extends Stage {
      */
     public String getSelection() {
         return selection;
+    }
+    public String getName() {
+        return nameField.getText();
+    }
+    public String getLeader() {
+        return leaderField.getText();
+    }
+    public String getCapital() {
+        return capitalField.getText();
     }
  
     /**

@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
@@ -40,29 +42,31 @@ public class MapEditorController {
 
     }
 
-    public void processEditItem(RegionItem e) {
+    public String processEditItem(RegionItem e, RegioVincoMapEditor app) {
+        DataManager dm = (DataManager) app.getDataComponent();
         EditDialog myDiag = EditDialog.getSingleton();
         Stage newStage = new Stage();
-        myDiag.init(newStage);
-        myDiag.show();
-    }
-
-    public void processColorButton() {
-        ColorDialog myDiag = ColorDialog.getSingleton();
-        Stage newStage = new Stage();
-        myDiag.init(newStage);
-        myDiag.show();
+        myDiag.init(newStage, e, dm.getParent() + "/" + dm.getName() + "/" + e.getName());
+        myDiag.show("Edit Item");
+        if (myDiag.getSelection().equalsIgnoreCase("yes") ||myDiag.getSelection().equalsIgnoreCase("right") || myDiag.getSelection().equalsIgnoreCase("left")) {
+            e.setName(myDiag.getName());
+            e.setLeader(myDiag.getLeader());
+            e.setCapital(myDiag.getCapital());
+            e.setLeaderPath(dm.getParent() + "/" + dm.getName() + "/" + e.getLeader() + ".png");
+            e.setFlagPath(dm.getParent() + "/" + dm.getName() + "/" + e.getName() + " Flag.png");
+        }
+        return myDiag.getSelection();
     }
 
     public void processNewButton(RegioVincoMapEditor app) {
         //TODO string literals
         NewDialog myDiag = NewDialog.getSingleton();
         Stage newStage = new Stage();
-        
+
         myDiag.init(newStage);
 
         myDiag.show("New Map");
-        
+
         System.out.println(myDiag.getSelection());
         if (myDiag.getSelection().equalsIgnoreCase("yes")) {
             if (myDiag.getName().equals("[](no name)") || myDiag.getName().equals("") || myDiag.getParentDirectory() == null || myDiag.getDataDirectory() == null) {
@@ -76,7 +80,9 @@ public class MapEditorController {
                 dm.setName(myDiag.getName());
                 dm.setParent(myDiag.getParentDirectory());
                 dm.setRawPath(myDiag.getDataDirectory());
-                System.out.println("Name: " +dm.getName());
+                dm.setBackgroundColor("#99d6ff");
+                dm.setBorderColor("#000000");
+                System.out.println("Name: " + dm.getName());
                 System.out.println("PD: " + myDiag.getParentDirectory());
                 System.out.println("DD: " + myDiag.getDataDirectory());
                 try {
@@ -90,17 +96,18 @@ public class MapEditorController {
                 app.getGUI().getExportButton().setDisable(false);
                 app.getGUI().getRenameButton().setDisable(false);
                 app.getGUI().getAddButton().setDisable(false);
-               // app.getGUI().getRemoveButton().setDisable(false);
+                // app.getGUI().getRemoveButton().setDisable(false);
                 app.getGUI().getBackgroundButton().setDisable(false);
                 app.getGUI().getBorderColorButton().setDisable(false);
-                String anthemPath = dm.getParent()+"/"+dm.getName()+" National Anthem.mid";
+
+                app.getGUI().getResizeButton().setDisable(false);
+                String anthemPath = dm.getParent() + "/" + dm.getName() + "/" + dm.getName() + " National Anthem.mid";
                 File anthemFile = new File(anthemPath);
-                if(anthemFile.exists()) {
-                    System.out.println("Found anthem file: " +anthemPath);
+                if (anthemFile.exists()) {
+                    System.out.println("Found anthem file: " + anthemPath);
                     app.getGUI().getPlayButton().setDisable(false);
-                }
-                else { 
-                    System.out.println("Did not find anthem file: " +anthemPath);
+                } else {
+                    System.out.println("Did not find anthem file: " + anthemPath);
                 }
                 app.getGUI().getZoomSlider().setDisable(false);
                 app.getGUI().getZoomSlider().setValue(0);
@@ -108,7 +115,29 @@ public class MapEditorController {
                 app.getGUI().getThickness().setValue(0);
                 app.getGUI().getReassignButton().setDisable(false);
                 app.getWorkspaceComponent().reloadWorkspace();
+                int x = 0;
+                for (int i = 0; i < dm.getItems().size(); i++) {
+                    RegionItem item = dm.getItems().get(i);
+                    item.setLeaderPath(dm.getParent() + "/" + dm.getName() + "/" + item.getLeader() + ".png");
+                    item.setFlagPath(dm.getParent() + "/" + dm.getName() + "/" + item.getName() + " Flag.png");
+                    if (dm.getItems().size() > 255) {
+
+                    } else {
+                        x = x + 253 / dm.getItems().size();
+
+                        dm.getItems().get(i).setRed(x);
+                        dm.getItems().get(i).setBlue(x);
+                        dm.getItems().get(i).setGreen(x);
+                        String hex = String.format("#%02x%02x%02x", dm.getItems().get(i).getRed(), dm.getItems().get(i).getGreen(), dm.getItems().get(i).getBlue());
+                        dm.getItems().get(i).getPoly().setFill(Paint.valueOf(hex));
+                        // System.out.println("Grey value for index " +i+" " +hex);
+                    }
+                }
+                x = 0;
+                app.getGUI().getColorButton().setValue(Color.valueOf(dm.getBackgroundColor()));
+                app.getGUI().getBorderColorButton().setValue(Color.valueOf(dm.getBorderColor()));
             }
+
         }
     }
 
@@ -117,11 +146,12 @@ public class MapEditorController {
         //TODO make sure loaddata works with relative path
         app.getFileComponent().loadData(app.getDataComponent(), dm.getRawPath());
         dm.setBackgroundColor("#99d6ff");
-        dm.setBigFlagPath(dm.getParent()+"/"+dm.getName()+" Flag.png");
+        dm.setBigFlagPath(dm.getParent() + "/" + dm.getName() + "/" + dm.getName() + " Flag.png");
         System.out.println("Flag path: " + dm.getBigFlagPath());
         dm.setBorderColor("#000000");
         dm.setHeight(536);
-        dm.setSealPath(dm.getParent()+dm.getName()+" Seal.png");
+        dm.setSealPath(dm.getParent() + "/" + dm.getName() + "/" + dm.getName() + " Seal.png");
+        System.out.println("Seal path: " + dm.getSealPath());
         dm.setThickness(1.0);
         dm.setWidth(802);
         dm.setZoom(1.0);
@@ -135,13 +165,13 @@ public class MapEditorController {
             myit.setLeader("[](no leader)");
             myit.setLeaderPath("[](no leader path)");
             myit.setName("[](no name)");
-        
-    }
+
+        }
         Workspace work = (Workspace) app.getWorkspaceComponent();
         work.reloadWorkspace();
-}
+    }
 
-public void processSaveTest(RegioVincoMapEditor app) {
+    public void processSaveTest(RegioVincoMapEditor app) {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File(PATH_WORK));
         fc.setTitle("Save Work to File");

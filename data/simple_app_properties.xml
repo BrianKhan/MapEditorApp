@@ -30,6 +30,7 @@
         <property name="FLAG_PATH"              value="Flag.png"></property>
         <property name="BORDER_COLOR"           value="Border.png"></property>
         <property name="REMOVE"                 value="Remove.png"></property>
+        <property name="RESIZE_ICON" 			value="Resize.png"></property>
         
         <!-- TOOLTIPS FOR BUTTONS -->
         <property name="NEW_TOOLTIP"		value="Create new project"></property>
@@ -39,7 +40,7 @@
         <property name="EXPORT_TOOLTIP"     value="Export the image"></property>
         <property name="CHANGE_TOOLTIP"     value="Change the map name"></property>
         <property name="ADD_TOOLTIP"        value="Add an image to the map"></property>
-        <property name="CHANGE_COLOR_TOOLTIP"   value="Change the color of this region"></property>
+        <property name="CHANGE_COLOR_TOOLTIP"   value="Change the background color"></property>
         <property name="REASSIGN_COLOR_TOOLTIP"     value="Randomly reassign the colors on the map"></property>
         <property name="THICKNESS_TOOLTIP"      value="Thickness"></property>
         <property name="ZOOM_TOOLTIP"           value="Zoom"></property>
@@ -47,6 +48,7 @@
         <property name="PAUSE_TOOLTIP"          value="Pause the anthem"></property>
         <property name="BORDER_COLOR_TOOLTIP"   value="Select Border Color"></property>
         <property name="REMOVE_TOOLTIP"                 value="Remove selected"></property>
+        <property name="RESIZE_TOOLTIP" 			value="Change map dimensions"></property>
 
         
         <!-- ERROR MESSAGES -->

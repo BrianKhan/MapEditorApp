@@ -20,6 +20,7 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import properties_manager.PropertiesManager;
 import saf.components.AppStyleArbiter;
@@ -70,6 +71,7 @@ public class ColorDialog extends Stage {
     Button rightButton;
     
     String selection;
+    String color;
     PropertiesManager props;
     String YES;
     String NO;
@@ -127,6 +129,7 @@ public class ColorDialog extends Stage {
         // LABELS AND TEXT FIELDS
         nameLabel = new Label(props.getProperty(PropertyType.COLOR));
         ColorPicker cp = new ColorPicker();
+        cp.setValue(Color.valueOf("#000000"));
         leaderLabel = new Label(props.getProperty(PropertyType.LEADER));
         capitalLabel = new Label(props.getProperty(PropertyType.CAPITAL));
 
@@ -147,6 +150,9 @@ public class ColorDialog extends Stage {
         EventHandler yesNoCancelHandler = (EventHandler<ActionEvent>) (ActionEvent ae) -> {
             Button sourceButton = (Button)ae.getSource();
             ColorDialog.this.selection = sourceButton.getText();
+            if(selection.equalsIgnoreCase("yes")) {
+                color = cp.getValue().toString();
+            }
             ColorDialog.this.hide();
         };
         
@@ -199,6 +205,12 @@ public class ColorDialog extends Stage {
      */
     public String getSelection() {
         return selection;
+    }
+    public String getColor() {
+        return color;
+    }
+    public void setColor(String col) {
+        color = col;
     }
  
     /**
