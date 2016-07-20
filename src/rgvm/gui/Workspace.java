@@ -82,6 +82,8 @@ public class Workspace extends AppWorkspaceComponent {
     double highestY;
     double highestX;
     double zoom;
+    double diffX;
+    double diffY;
     Pane firstParent;
     
 
@@ -288,15 +290,31 @@ public class Workspace extends AppWorkspaceComponent {
     public void fixLayout() {
         // apply layout functions based on size
         Scale scale = new Scale();
-        double diff = highestX-lowestX;
-        zoom = 2.22;//135, 2.22;
-        System.out.println(lowestX);
+        diffX = highestX-lowestX;
+        diffY = highestY-lowestY;
+        if(diffX > diffY) {
+            //zoom = 137.149-.374803*diffX;//135, 2.22;
+        //EXPONENTIAL SCALE
+        
+        zoom = 6716.945547*(Math.pow(diffX, -.022264));
+        // 360 = 2.22
+        //5.733737945556754 = 135
+        //0.11345863342279472 = 
+        }
+        if(diffY> diffX) {
+            zoom = 6716.945547*(Math.pow(diffY, -.022264));
+        }
+        
+        System.out.println("Zoom: " +zoom);
+        System.out.println("Lowest X: " +lowestX);
+        System.out.println("DiffX: " +diffX);
         first.setTranslateX(-lowestX*zoom);
         //first.setTranslateX(((-180-lowestX)*zoom)+180*zoom);
         
         //first.setTranslateY(((-9999+highestY)*zoom)+9999*zoom);
        //this one was good first.setTranslateY((firstParent.getHeight()/2)+highestY*zoom);
-        first.setTranslateY((firstParent.getHeight()/2)+(((highestY-lowestY)/2)*zoom));
+       // first.setTranslateY((firstParent.getHeight()/2)+(((highestY-lowestY)/2)*zoom));
+       first.setTranslateY(highestY*zoom);
         scale.setX(zoom);
         scale.setY(-zoom);
         first.getTransforms().add(scale);
@@ -377,7 +395,9 @@ public class Workspace extends AppWorkspaceComponent {
         lowestX = 900;
         highestY = -900;
         lowestY = 900;
-        highestX = 900;
+        highestX = -900;
+        diffX = 0;
+        diffY = 0;
         layoutMap();
         fixLayout();
 
