@@ -45,6 +45,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
@@ -106,6 +107,8 @@ public class Workspace extends AppWorkspaceComponent {
     boolean ignore;
     Sequence audio;
     Sequencer sqr;
+    double mouseX;
+    double mouseY;
 
     public Workspace(RegioVincoMapEditor initApp) {
 
@@ -181,6 +184,7 @@ public class Workspace extends AppWorkspaceComponent {
                     firstParent.getChildren().remove(i);
                 }
             }
+            gui.getRemoveButton().setDisable(true);
         });
         gui.getSaveButton().setOnMouseClicked(e -> {
             controller.processSaveButton(app);
@@ -188,18 +192,46 @@ public class Workspace extends AppWorkspaceComponent {
         gui.getOpenButton().setOnMouseClicked(e -> {
             try {
                 ignore = true;
+
                 controller.processOpenButton(app);
-                ignore = false;
                 for (int i = 0; i < firstParent.getChildren().size(); i++) {
                     if (firstParent.getChildren().get(i) instanceof ImageView) {
                         firstParent.getChildren().remove(i);
                     }
                 }
+                ignore = false;
 
             } catch (IOException ex) {
                 System.out.println("errors");
             }
+            gui.getRemoveButton().setDisable(true);
         });
+        //addddd
+        gui.getExportButton().setOnMouseClicked(e -> {
+            gui.getRemoveButton().setDisable(true);
+            itemsTable.getSelectionModel().clearSelection();
+            DirectoryChooser directChoose = new DirectoryChooser();
+
+            directChoose.setTitle("Directory to save RVM and PNG file");
+            File fil = new File("./export");
+            directChoose.setInitialDirectory(fil);
+            String dcPath = directChoose.showDialog(app.getGUI().getWindow()).getAbsolutePath();
+            String mdcPath = dcPath +"/"+ dm.getName() + ".png";
+            System.out.println("Saving png file as: " + mdcPath);
+            WritableImage img = firstParent.snapshot(new SnapshotParameters(), null);
+            File image = new File(mdcPath);
+
+            try {
+                ImageIO.write(SwingFXUtils.fromFXImage(img, null), "png", image);
+                System.out.println("image write successful");
+            } catch (IOException ex) {
+                Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            String absPath = dcPath + "/" + dm.getName() +".rvm";
+            controller.processExportButton(app, absPath);
+
+        });
+
         gui.getAddButton().setOnMouseClicked(e -> {
             FileChooser fc = new FileChooser();
             fc.setInitialDirectory(new File("./"));
@@ -219,10 +251,30 @@ public class Workspace extends AppWorkspaceComponent {
                         firstParent.getChildren().remove(img);
                         gui.getRemoveButton().setDisable(true);
                     });
+                    firstParent.setOnMouseClicked(exxx -> {
+                        if (!img.focusedProperty().get()) {
+                            gui.getRemoveButton().setDisable(true);
+                        }
+                    });
                 });
-                img.setOnMouseDragged(exx -> {
-                    img.setLayoutX(exx.getSceneX() - 7);
-                    img.setLayoutY(exx.getSceneY() - 95);
+                /*      img.setOnMouseDragged(exx -> {
+                    
+                    img.relocate(zoom, zoom);
+                    img.setLayoutX(exx.getScreenX());
+                    img.setLayoutY(exx.getScreenY());
+                }); */
+                img.setOnMousePressed(event -> {
+                    mouseX = event.getSceneX();
+                    mouseY = event.getSceneY();
+                });
+
+                img.setOnMouseDragged(events -> {
+                    img.requestFocus();
+                    double deltaX = events.getSceneX() - mouseX;
+                    double deltaY = events.getSceneY() - mouseY;
+                    img.relocate(img.getLayoutX() + deltaX, img.getLayoutY() + deltaY);
+                    mouseX = events.getSceneX();
+                    mouseY = events.getSceneY();
                 });
                 img.focusedProperty().addListener(new ChangeListener<Boolean>() {
                     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -241,6 +293,7 @@ public class Workspace extends AppWorkspaceComponent {
             }
         });
         gui.getPlayButton().setOnMouseClicked(e -> {
+            gui.getRemoveButton().setDisable(true);
             String anthemPath = dm.getParent() + "/" + dm.getName() + "/" + dm.getName() + " National Anthem.mid";
             File anthemFile = new File(anthemPath);
             if (anthemFile.exists()) {
@@ -263,6 +316,7 @@ public class Workspace extends AppWorkspaceComponent {
         });
         gui.getZoomSlider()
                 .setOnMouseReleased(e -> {
+                    gui.getRemoveButton().setDisable(true);
                     ignore = true;
                     gui.getZoomSlider().setValue(50);
                     ignore = false;
@@ -270,6 +324,7 @@ public class Workspace extends AppWorkspaceComponent {
                 );
         gui.getResizeButton()
                 .setOnMouseClicked(e -> {
+                    gui.getRemoveButton().setDisable(true);
                     controller.processResizeButton(app);
                     myClip.setHeight(dm.getHeight());
                     myClip.setWidth(dm.getWidth());
@@ -278,6 +333,7 @@ public class Workspace extends AppWorkspaceComponent {
                 );
         gui.getReassignButton()
                 .setOnMouseClicked(e -> {
+                    gui.getRemoveButton().setDisable(true);
                     if (dm.getItems().size() < 256) {
                         Random rand = new Random();
                         int rnd;
@@ -394,6 +450,7 @@ public class Workspace extends AppWorkspaceComponent {
             }
         });
         gui.getRenameButton().setOnMouseClicked(e -> {
+            gui.getRemoveButton().setDisable(true);
             renameDialog myDiag = renameDialog.getSingleton();
             Stage newStage = new Stage();
 
@@ -422,11 +479,9 @@ public class Workspace extends AppWorkspaceComponent {
         });
         first.setOnMouseClicked(e -> {
             first.requestFocus();
-            System.out.println("X: " + e.getX() + "Y: " + e.getY());
-            System.out.println("Width: " + itemsTable.getWidth());
-
         });
         gui.getAppPane().setOnKeyPressed(e -> {
+            gui.getRemoveButton().setDisable(true);
             if (e.getCode().equals(KeyCode.RIGHT)) {
                 moveRight();
             }
@@ -449,14 +504,9 @@ public class Workspace extends AppWorkspaceComponent {
                 //  zoomOut(manual);
             }
         });
-        itemsTable.setOnMouseClicked(e -> {
-
-            if (e.getClickCount() == 2) {
-
-            }
-        });
 
         itemsTable.setOnKeyPressed(e -> {
+            gui.getRemoveButton().setDisable(true);
             itemsTable.getSelectionModel().clearSelection();
             if (e.getCode().equals(KeyCode.RIGHT)) {
                 moveRight();
@@ -471,18 +521,9 @@ public class Workspace extends AppWorkspaceComponent {
             if (e.getCode().equals(KeyCode.DOWN)) {
                 moveDown();
             }
-            if (e.getCode().equals(KeyCode.NUMPAD2)) {
-
-                boolean manual = true;
-                // zoomIn(manual);
-            }
-            if (e.getCode().equals(KeyCode.NUMPAD1)) {
-                boolean manual = true;
-                // zoomOut(manual);
-            }
         });
         itemsTable.setOnMouseClicked(e -> {
-
+            gui.getRemoveButton().setDisable(true);
             if (e.getClickCount() == 2) {
                 editItem();
             }
@@ -609,21 +650,6 @@ public class Workspace extends AppWorkspaceComponent {
             myGon.setStroke(Paint.valueOf("#000000"));
             myGon.setStrokeWidth(.01);
             first.getChildren().add(myGon);
-            //blue ocean
-            // first.getParent().setStyle("-fx-background-color: #99d6ff;");
-            // first.setStyle("-fx-background-color: #99d6ff;");
-            /*     DataManager dm = (DataManager) app.getDataComponent();
-        first.resize(dm.getWidth(), dm.getHeight());
-        firstParent.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
-        WritableImage wi = new WritableImage((int)dm.getWidth(), (int)dm.getHeight());
-        WritableImage snapshot = first.snapshot(new SnapshotParameters(), wi);
-        File output = new File("snapshot" + ".png");
-            try {
-                ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", output);
-            } catch (IOException ex) {
-                System.out.println("Snapshot error");
-            } */
-
         }
     }
 

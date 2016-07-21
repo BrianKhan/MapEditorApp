@@ -47,15 +47,17 @@ public class MapEditorController {
         DataManager dm = (DataManager) app.getDataComponent();
         EditDialog myDiag = EditDialog.getSingleton();
         Stage newStage = new Stage();
-        newStage.initStyle(StageStyle.UNDECORATED);
+        e.setLeaderPath(dm.getParent() + "/" + dm.getName() + "/" + e.getLeader() + ".png");
+        e.setFlagPath(dm.getParent() + "/" + dm.getName() + "/" + e.getName() + " Flag.png");
+        
         myDiag.init(newStage, e, dm.getParent() + "/" + dm.getName() + "/" + e.getName());
         myDiag.show("Edit Item");
+        
         if (myDiag.getSelection().equalsIgnoreCase("yes") || myDiag.getSelection().equalsIgnoreCase("right") || myDiag.getSelection().equalsIgnoreCase("left")) {
             e.setName(myDiag.getName());
             e.setLeader(myDiag.getLeader());
             e.setCapital(myDiag.getCapital());
-            e.setLeaderPath(dm.getParent() + "/" + dm.getName() + "/" + e.getLeader() + ".png");
-            e.setFlagPath(dm.getParent() + "/" + dm.getName() + "/" + e.getName() + " Flag.png");
+
         }
         return myDiag.getSelection();
     }
@@ -266,16 +268,10 @@ public class MapEditorController {
 
     }
 
-    public void processExportTest(RegioVincoMapEditor app) {
-        FileChooser fc = new FileChooser();
-        fc.setInitialDirectory(new File("./export/"));
-        fc.setTitle("Save Work to RVM File");
-        fc.getExtensionFilters().addAll(
-                new ExtensionFilter("Regio Vinco Map File", "*.rvm"));
-        File selectedFile = fc.showSaveDialog(app.getGUI().getWindow());
+    public void processExportButton(RegioVincoMapEditor app, String absolutePath) {
         try {
-
-            app.getFileComponent().exportData(app.getDataComponent(), selectedFile.getAbsolutePath());
+            DataManager dm = (DataManager) app.getDataComponent();
+            app.getFileComponent().exportData(app.getDataComponent(), absolutePath);
         } catch (IOException ex) {
             System.out.println("errors");
         }

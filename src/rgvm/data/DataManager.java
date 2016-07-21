@@ -1,5 +1,6 @@
 package rgvm.data;
 
+import java.io.File;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ProgressBar;
@@ -56,23 +57,26 @@ public class DataManager implements AppDataComponent {
 
     public boolean hasCapitals() {
         for (int i = 0; i < data.size(); i++) {
-            if (data.get(i).getCapital() == "") {
+            if (data.get(i).getCapital().equalsIgnoreCase("") || data.get(i).getCapital().equalsIgnoreCase("[](no capital)")) {
                 return false;
             }
         }
         return true;
     }
+
     public boolean hasLeaders() {
         for (int i = 0; i < data.size(); i++) {
-            if (data.get(i).getLeader() == "") {
+            if (data.get(i).getLeader().equalsIgnoreCase("") || data.get(i).getLeader().equalsIgnoreCase("[](no leader)")) {
                 return false;
             }
         }
         return true;
     }
+
     public boolean hasFlags() {
         for (int i = 0; i < data.size(); i++) {
-            if (data.get(i).getFlagPath().equals("")) {
+            File fil = new File(data.get(i).getFlagPath());
+            if (!fil.exists()) {
                 return false;
             }
         }

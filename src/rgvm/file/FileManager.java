@@ -5,6 +5,7 @@
  */
 package rgvm.file;
 
+import java.io.File;
 import javafx.scene.text.Font;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -328,6 +329,7 @@ public class FileManager implements AppFileComponent {
         jsonWriter.close();
 
         // INIT THE WRITER
+
         OutputStream os = new FileOutputStream(filePath);
         JsonWriter jsonFileWriter = Json.createWriter(os);
         jsonFileWriter.writeObject(dataManagerJSO);
