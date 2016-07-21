@@ -25,6 +25,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -44,6 +45,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 import javax.sound.midi.InvalidMidiDataException;
@@ -64,6 +66,7 @@ import rgvm.dialog.renameDialog;
 import static saf.settings.AppStartupConstants.FILE_PROTOCOL;
 import static saf.settings.AppStartupConstants.PATH_IMAGES;
 import static saf.settings.AppPropertyType.*;
+import static saf.settings.AppStartupConstants.PATH_WORK;
 import saf.ui.AppGUI;
 
 /**
@@ -173,6 +176,11 @@ public class Workspace extends AppWorkspaceComponent {
 
         gui.getNewButton().setOnMouseClicked(e -> {
             controller.processNewButton(app);
+            for (int i = 0; i < firstParent.getChildren().size(); i++) {
+                if (firstParent.getChildren().get(i) instanceof ImageView) {
+                    firstParent.getChildren().remove(i);
+                }
+            }
         });
         gui.getSaveButton().setOnMouseClicked(e -> {
             controller.processSaveButton(app);
@@ -182,9 +190,54 @@ public class Workspace extends AppWorkspaceComponent {
                 ignore = true;
                 controller.processOpenButton(app);
                 ignore = false;
+                for (int i = 0; i < firstParent.getChildren().size(); i++) {
+                    if (firstParent.getChildren().get(i) instanceof ImageView) {
+                        firstParent.getChildren().remove(i);
+                    }
+                }
 
             } catch (IOException ex) {
                 System.out.println("errors");
+            }
+        });
+        gui.getAddButton().setOnMouseClicked(e -> {
+            FileChooser fc = new FileChooser();
+            fc.setInitialDirectory(new File("./"));
+            fc.setTitle("Open Image File");
+            fc.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("PNG File", "*.png"));
+            File selectedFile = fc.showOpenDialog(app.getGUI().getWindow());
+            if (selectedFile == null) {
+
+            } else {
+                Image image = new Image("FILE:" + selectedFile.getAbsolutePath());
+                ImageView img = new ImageView(image);
+                img.setOnMouseClicked(ex -> {
+                    img.requestFocus();
+                    gui.getRemoveButton().setOnMouseClicked(exx -> {
+                        System.out.println("running");
+                        firstParent.getChildren().remove(img);
+                        gui.getRemoveButton().setDisable(true);
+                    });
+                });
+                img.setOnMouseDragged(exx -> {
+                    img.setLayoutX(exx.getSceneX() - 7);
+                    img.setLayoutY(exx.getSceneY() - 95);
+                });
+                img.focusedProperty().addListener(new ChangeListener<Boolean>() {
+                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                        if (newValue.booleanValue()) {
+                            DropShadow ds = new DropShadow(20, Color.YELLOW);
+                            img.setEffect(ds);
+                            gui.getRemoveButton().setDisable(false);
+                        } else {
+                            img.setEffect(null);
+                        }
+                    }
+                });
+
+                firstParent.getChildren().add(img);
+
             }
         });
         gui.getPlayButton().setOnMouseClicked(e -> {
@@ -441,6 +494,7 @@ public class Workspace extends AppWorkspaceComponent {
     public void editItem() {
         if (itemsTable.getSelectionModel().getSelectedItem() != null) {
             MapEditorController controller = new MapEditorController();
+            itemsTable.getSelectionModel().getSelectedItem().getPoly().toFront();
             String x = controller.processEditItem(itemsTable.getSelectionModel().getSelectedItem(), app);
             if (x.equalsIgnoreCase("right")) {
                 itemsTable.getSelectionModel().selectNext();
@@ -527,13 +581,23 @@ public class Workspace extends AppWorkspaceComponent {
             myGon.setStrokeWidth(dataManager.getThickness());
             dataManager.getItems().get(i).setPoly(myGon);
             myGon.setOnMouseClicked(e -> {
+                gui.getRemoveButton().setDisable(true);
                 for (int j = 0; j < dataManager.getItems().size(); j++) {
                     if (dataManager.getItems().get(j).getPoly().equals(myGon)) {
                         itemsTable.getSelectionModel().select(dataManager.getItems().get(j));
                         myGon.toFront();
                         if (e.getClickCount() == 2) {
                             MapEditorController controller = new MapEditorController();
-                            controller.processEditItem(itemsTable.getSelectionModel().getSelectedItem(), app);
+                            //highlight
+                            String x = controller.processEditItem(itemsTable.getSelectionModel().getSelectedItem(), app);
+                            if (x.equalsIgnoreCase("right")) {
+                                itemsTable.getSelectionModel().selectNext();
+                                editItem();
+                            }
+                            if (x.equalsIgnoreCase("left")) {
+                                itemsTable.getSelectionModel().selectPrevious();
+                                editItem();
+                            }
                         }
                     }
 
@@ -592,6 +656,14 @@ public class Workspace extends AppWorkspaceComponent {
         } catch (MidiUnavailableException ex) {
             Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
         }
+        app.getGUI().getPrimaryScene().getWindow().setOnCloseRequest(e -> {
+            try {
+                sqr.close();
+                System.exit(0);
+            } catch (Exception eeee) {
+
+            }
+        });
 
         gui.getThickness().setValue((dataManager.getThickness() * 10000) / 2);
         gui.getZoomSlider().setValue(50);

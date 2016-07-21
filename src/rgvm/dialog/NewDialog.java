@@ -101,6 +101,8 @@ public class NewDialog extends Stage {
         props = PropertiesManager.getPropertiesManager();
         YES = props.getProperty(PropertyType.YES);
         NO = props.getProperty(PropertyType.NO);
+        
+        
     }
 
     /**
@@ -174,12 +176,15 @@ public class NewDialog extends Stage {
         //TODO string literals
         nameBox.getChildren().add(new Label("Parent Directory: "));
         nameBox.getChildren().add(parentField = new TextField("Parent Directory"));
+        
+        parentField.setDisable(true);
         Button directButton = new Button("Choose Parent Directory");
         nameBox.getChildren().add(directButton);
 
         HBox dataBox = new HBox();
         dataBox.getChildren().add(new Label("Data File: "));
         dataBox.getChildren().add(fileField = new TextField("Data Directory"));
+        fileField.setDisable(true);
         Button fileDirect = new Button("Choose File");
         dataBox.getChildren().add(fileDirect);
         directButton.setOnMouseClicked(e -> {
@@ -211,6 +216,8 @@ public class NewDialog extends Stage {
             File fil = new File(".");
 
             myChoose.setInitialDirectory(fil);
+            myChoose.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("JSON File", "*.json"));
             File dc = myChoose.showOpenDialog(myStage);
             if (dc != null) {
                 
