@@ -50,6 +50,46 @@ import saf.components.AppFileComponent;
  */
 public class FileManager implements AppFileComponent {
 
+    public void openData(AppDataComponent data, String filePath) throws IOException {
+        DataManager dm = (DataManager) data;
+        dm.reset();
+        JsonObject json = loadJSONFile(filePath);
+        
+        dm.setName(json.getString("MAP_NAME"));
+        dm.setParent(json.getString("PARENT_DIRECTORY").replace("\\","/"));
+        dm.setWidth(json.getJsonNumber("WIDTH").doubleValue());
+        dm.setHeight(json.getJsonNumber("HEIGHT").doubleValue());
+        dm.setThickness(json.getJsonNumber("BORDER_THICKNESS").doubleValue());
+        dm.setZoom(json.getJsonNumber("ZOOM").doubleValue());
+        dm.setBackgroundColor(json.getString("BACKGROUND_COLOR"));
+        dm.setBorderColor(json.getString("BORDER_COLOR"));
+        dm.setRawPath(json.getString("RAW_PATH").replace("\\", "/"));
+        dm.setBigFlagPath(json.getString("BIG_FLAG_PATH"));
+        dm.setSealPath(json.getString("SEAL_PATH"));
+        JsonArray jsonRegionArray = json.getJsonArray("REGION");
+        
+        for (int i = 0; i < jsonRegionArray.size(); i++) {
+            JsonObject jsonRegion = jsonRegionArray.getJsonObject(i);
+            RegionItem region = new RegionItem();
+            region.setName(jsonRegion.getString("NAME"));
+            region.setLeader(jsonRegion.getString("LEADER"));
+            region.setCapital(jsonRegion.getString("CAPITAL"));
+            region.setFlagPath(jsonRegion.getString("FLAG_PATH"));
+            region.setLeaderPath(jsonRegion.getString("LEADER_PATH"));
+            region.setRed(jsonRegion.getJsonNumber("RED").intValue());
+            region.setBlue(jsonRegion.getJsonNumber("BLUE").intValue());
+            region.setGreen(jsonRegion.getJsonNumber("GREEN").intValue());
+            JsonArray jsonSecond = jsonRegion.getJsonArray("POINTS");
+            for (int j = 0; j < jsonSecond.size(); j++) {
+                JsonObject myItem = jsonSecond.getJsonObject(j);
+                double x = myItem.getJsonNumber("X").doubleValue();
+                double y = myItem.getJsonNumber("Y").doubleValue();
+                region.add(x, y);
+            }
+            dm.addItem(region);
+        }
+    }
+
     public void loadRVME(AppDataComponent data, String filePath) throws IOException {
         DataManager dm = (DataManager) data;
         dm.reset();
@@ -195,6 +235,7 @@ public class FileManager implements AppFileComponent {
             arrayBuilder.add(itemJson);
         }
         JsonArray itemsArray = arrayBuilder.build();
+
         JsonObject dataManagerJSO = Json.createObjectBuilder()
                 .add("MAP_NAME", manager.getName())
                 .add("PARENT_DIRECTORY", manager.getParent())

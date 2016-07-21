@@ -23,6 +23,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
+import javafx.stage.StageStyle;
 import properties_manager.PropertiesManager;
 import saf.components.AppStyleArbiter;
 import static saf.components.AppStyleArbiter.CLASS_BORDERED_PANE;
@@ -128,11 +129,18 @@ public class EditDialog extends Stage {
         // CHANGED SO THAT WE ONLY SET THIS WINDOW MODAL ONCE, AS WE 
         // CAN ONLY INITIALIZE IN OUR WORKSPACE CLASS EACH TIME WE HIT THE BUTTON
         if(primaryStage.getModality().toString() != "NONE") {
-            
+           
         initModality(Modality.WINDOW_MODAL);
         
         initOwner(primaryStage);
+        
         }
+        Stage myStage = primaryStage;
+        this.setOnCloseRequest ( e-> { 
+            selection = "no";
+            e.consume();
+            this.hide();
+        });
         // LABELS AND TEXT FIELDS
         nameLabel = new Label(props.getProperty(PropertyType.NAME));        
         leaderLabel = new Label(props.getProperty(PropertyType.LEADER));
@@ -160,6 +168,10 @@ public class EditDialog extends Stage {
             EditDialog.this.selection = sourceButton.getText();
             EditDialog.this.hide();
         };
+        myStage.setOnCloseRequest(e-> {
+            selection = "no";
+            EditDialog.this.hide();
+        });
         
 	// AND THEN REGISTER THEM TO RESPOND TO INTERACTIONS
         yesButton.setOnAction(yesNoCancelHandler);
@@ -275,6 +287,7 @@ public class EditDialog extends Stage {
     public String getCapital() {
         return capitalField.getText();
     }
+    
  
     /**
      * This method loads a custom message into the label

@@ -46,9 +46,10 @@ public class MapEditorController {
         DataManager dm = (DataManager) app.getDataComponent();
         EditDialog myDiag = EditDialog.getSingleton();
         Stage newStage = new Stage();
+        newStage.initStyle(StageStyle.UNDECORATED);
         myDiag.init(newStage, e, dm.getParent() + "/" + dm.getName() + "/" + e.getName());
         myDiag.show("Edit Item");
-        if (myDiag.getSelection().equalsIgnoreCase("yes") ||myDiag.getSelection().equalsIgnoreCase("right") || myDiag.getSelection().equalsIgnoreCase("left")) {
+        if (myDiag.getSelection().equalsIgnoreCase("yes") || myDiag.getSelection().equalsIgnoreCase("right") || myDiag.getSelection().equalsIgnoreCase("left")) {
             e.setName(myDiag.getName());
             e.setLeader(myDiag.getLeader());
             e.setCapital(myDiag.getCapital());
@@ -58,13 +59,67 @@ public class MapEditorController {
         return myDiag.getSelection();
     }
 
+    public void processOpenButton(RegioVincoMapEditor app) throws IOException {
+        FileChooser fc = new FileChooser();
+        fc.setInitialDirectory(new File(PATH_WORK));
+        fc.setTitle("Open RVME File");
+        fc.getExtensionFilters().addAll(
+                new ExtensionFilter("Regio Vinco Map Editor File", "*.rvme"));
+        File selectedFile = fc.showOpenDialog(app.getGUI().getWindow());
+
+        FileManager fm = (FileManager) app.getFileComponent();
+        Workspace work = (Workspace) app.getWorkspaceComponent();
+        app.getDataComponent().reset();
+        DataManager dm = (DataManager) app.getDataComponent();
+        fm.openData(app.getDataComponent(), selectedFile.getAbsolutePath());
+        app.getGUI().getSaveButton().setDisable(true);
+        app.getGUI().getThickness().setDisable(false);
+        app.getGUI().getZoomSlider().setDisable(false);
+        app.getGUI().getColorButton().setDisable(false);
+        app.getGUI().getSaveButton().setDisable(false);
+        app.getGUI().getExportButton().setDisable(false);
+        app.getGUI().getRenameButton().setDisable(false);
+        app.getGUI().getAddButton().setDisable(false);
+        // app.getGUI().getRemoveButton().setDisable(false);
+        app.getGUI().getBackgroundButton().setDisable(false);
+        app.getGUI().getBorderColorButton().setDisable(false);
+        app.getGUI().getReassignButton().setDisable(false);
+        app.getGUI().getResizeButton().setDisable(false);
+        System.out.println("Name: " + dm.getName());
+        System.out.println("PD: " + dm.getParent());
+        System.out.println("DD: " + dm.getRawPath());
+        String anthemPath = dm.getParent() + "/" + dm.getName() + "/" + dm.getName() + " National Anthem.mid";
+        File anthemFile = new File(anthemPath);
+        if (anthemFile.exists()) {
+            System.out.println("Found anthem file: " + anthemPath);
+            app.getGUI().getPlayButton().setDisable(false);
+        } else {
+            System.out.println("Did not find anthem file: " + anthemPath);
+        }
+        app.getWorkspaceComponent().reloadWorkspace();
+        for (int i = 0; i < dm.getItems().size(); i++) {
+            RegionItem item = dm.getItems().get(i);
+            item.setLeaderPath(dm.getParent() + "/" + dm.getName() + "/" + item.getLeader() + ".png");
+            item.setFlagPath(dm.getParent() + "/" + dm.getName() + "/" + item.getName() + " Flag.png");
+            if (dm.getItems().size() > 255) {
+
+            } else {
+
+                String hex = String.format("#%02x%02x%02x", dm.getItems().get(i).getRed(), dm.getItems().get(i).getGreen(), dm.getItems().get(i).getBlue());
+                dm.getItems().get(i).getPoly().setFill(Paint.valueOf(hex));
+                dm.getItems().get(i).getPoly().setStrokeWidth(dm.getThickness());
+                // System.out.println("Grey value for index " +i+" " +hex);
+            }
+        }
+        app.getGUI().getColorButton().setValue(Color.valueOf(dm.getBackgroundColor()));
+        app.getGUI().getBorderColorButton().setValue(Color.valueOf(dm.getBorderColor()));
+    }
+
     public void processNewButton(RegioVincoMapEditor app) {
         //TODO string literals
         NewDialog myDiag = NewDialog.getSingleton();
         Stage newStage = new Stage();
-
         myDiag.init(newStage);
-
         myDiag.show("New Map");
 
         System.out.println(myDiag.getSelection());
@@ -78,8 +133,8 @@ public class MapEditorController {
                 app.getDataComponent().reset();
                 DataManager dm = (DataManager) app.getDataComponent();
                 dm.setName(myDiag.getName());
-                dm.setParent(myDiag.getParentDirectory());
-                dm.setRawPath(myDiag.getDataDirectory());
+                dm.setParent(myDiag.getParentDirectory().replace("\\", "/"));
+                dm.setRawPath(myDiag.getDataDirectory().replace("\\", "/"));
                 dm.setBackgroundColor("#99d6ff");
                 dm.setBorderColor("#000000");
                 System.out.println("Name: " + dm.getName());
@@ -110,10 +165,13 @@ public class MapEditorController {
                     System.out.println("Did not find anthem file: " + anthemPath);
                 }
                 app.getGUI().getZoomSlider().setDisable(false);
-                app.getGUI().getZoomSlider().setValue(0);
+
+                app.getGUI().getZoomSlider().setValue(50);
+                dm.setZoom(0);
                 app.getGUI().getThickness().setDisable(false);
-                app.getGUI().getThickness().setValue(0);
+                dm.setThickness(.01);
                 app.getGUI().getReassignButton().setDisable(false);
+                app.getGUI().getResizeButton().setDisable(false);
                 app.getWorkspaceComponent().reloadWorkspace();
                 int x = 0;
                 for (int i = 0; i < dm.getItems().size(); i++) {
@@ -141,6 +199,24 @@ public class MapEditorController {
         }
     }
 
+    public void processSaveButton(RegioVincoMapEditor app) {
+        FileChooser fc = new FileChooser();
+        fc.setInitialDirectory(new File(PATH_WORK));
+        fc.setTitle("Save Work to File");
+        fc.getExtensionFilters().addAll(
+                new ExtensionFilter("Regio Vinco Map Editor File", "*.rvme"));
+        File selectedFile = fc.showSaveDialog(app.getGUI().getWindow());
+
+        try {
+
+            app.getFileComponent().saveData(app.getDataComponent(), selectedFile.getAbsolutePath());
+        } catch (Exception ex) {
+            System.out.println("errors");
+        }
+
+        app.getGUI().getSaveButton().setDisable(true);
+    }
+
     public void processLoadNew(RegioVincoMapEditor app) throws IOException {
         DataManager dm = (DataManager) app.getDataComponent();
         //TODO make sure loaddata works with relative path
@@ -152,7 +228,7 @@ public class MapEditorController {
         dm.setHeight(536);
         dm.setSealPath(dm.getParent() + "/" + dm.getName() + "/" + dm.getName() + " Seal.png");
         System.out.println("Seal path: " + dm.getSealPath());
-        dm.setThickness(1.0);
+        dm.setThickness(.01);
         dm.setWidth(802);
         dm.setZoom(1.0);
 

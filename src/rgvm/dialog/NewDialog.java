@@ -126,7 +126,7 @@ public class NewDialog extends Stage {
         // CHANGED SO THAT WE ONLY SET THIS WINDOW MODAL ONCE, AS WE 
         // CAN ONLY INITIALIZE IN OUR WORKSPACE CLASS EACH TIME WE HIT THE BUTTON
         myStage = primaryStage;
-        
+
         if (primaryStage.getModality().toString() != "NONE") {
 
             initModality(Modality.WINDOW_MODAL);
@@ -157,7 +157,7 @@ public class NewDialog extends Stage {
             Button sourceButton = (Button) ae.getSource();
             NewDialog.this.selection = sourceButton.getText();
             name = nameField.getText();
-            
+
             NewDialog.this.hide();
         };
 
@@ -169,7 +169,7 @@ public class NewDialog extends Stage {
         HBox notherBox = new HBox();
         notherBox.getChildren().add(new Label("Name: "));
         notherBox.getChildren().add(nameField = new TextField());
-        
+
         nameBox = new HBox();
         //TODO string literals
         nameBox.getChildren().add(new Label("Parent Directory: "));
@@ -184,46 +184,53 @@ public class NewDialog extends Stage {
         dataBox.getChildren().add(fileDirect);
         directButton.setOnMouseClicked(e -> {
             DirectoryChooser directChoose = new DirectoryChooser();
+
             directChoose.setTitle("Open parent directory");
             File fil = new File(".");
             directChoose.setInitialDirectory(fil);
+
             File dc = directChoose.showDialog(myStage);
-            String s1 = dc.getAbsolutePath();
-            String s2 = fil.getAbsolutePath();
-            try { 
-                
-            parentDirectory = "."+s1.substring( s2.length()-2);
-            parentField.setText(parentDirectory);
-            }
-            catch (StringIndexOutOfBoundsException exc) {
-                AppMessageDialogSingleton single = AppMessageDialogSingleton.getSingleton();
-                single.show("bad directory", "Please choose a subdirectory within the initially shown folder");
-                this.requestFocus();
+            if (dc != null) {
+                String s1 = dc.getAbsolutePath();
+                String s2 = fil.getAbsolutePath();
+
+                try {
+
+                    parentDirectory = "." + s1.substring(s2.length() - 2);
+                    parentField.setText(parentDirectory);
+                } catch (StringIndexOutOfBoundsException exc) {
+                    AppMessageDialogSingleton single = AppMessageDialogSingleton.getSingleton();
+                    single.show("bad directory", "Please choose a subdirectory within the initially shown folder");
+                    this.requestFocus();
+                }
             }
         });
         fileDirect.setOnMouseClicked(e -> {
             FileChooser myChoose = new FileChooser();
             myChoose.setTitle("Open Data File");
             File fil = new File(".");
-            
+
             myChoose.setInitialDirectory(fil);
             File dc = myChoose.showOpenDialog(myStage);
-            String s1 = dc.getAbsolutePath();
-            String s2 = fil.getAbsolutePath();
-            
-            try { 
+            if (dc != null) {
                 
-            dataDirectory = "."+s1.substring( s2.length()-2);
-            fileField.setText(dataDirectory);
-            }
-            catch (StringIndexOutOfBoundsException exc) {
-                AppMessageDialogSingleton single = AppMessageDialogSingleton.getSingleton();
-                single.show("bad directory", "Please choose a subdirectory within the initially shown folder");
-                this.requestFocus();
+                String s1 = dc.getAbsolutePath();
+                String s2 = fil.getAbsolutePath();
+
+                try {
+
+                    dataDirectory = "." + s1.substring(s2.length() - 2);
+                    fileField.setText(dataDirectory);
+                } catch (StringIndexOutOfBoundsException exc) {
+                    AppMessageDialogSingleton single = AppMessageDialogSingleton.getSingleton();
+                    single.show("bad directory", "Please choose a subdirectory within the initially shown folder");
+                    this.requestFocus();
+                }
             }
         });
-        myStage.setOnCloseRequest(e-> {
+        this.setOnCloseRequest(e -> {
             selection = "no";
+            e.consume();
             this.hide();
         });
 
@@ -265,15 +272,18 @@ public class NewDialog extends Stage {
     public String getSelection() {
         return selection;
     }
+
     public String getName() {
-        if(name.equals("")) {
+        if (name.equals("")) {
             return "[](no name)";
         }
         return name;
     }
+
     public String getParentDirectory() {
-        return  parentDirectory;
+        return parentDirectory;
     }
+
     public String getDataDirectory() {
         return dataDirectory;
     }

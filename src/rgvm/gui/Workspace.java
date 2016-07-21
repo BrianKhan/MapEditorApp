@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.scene.SnapshotParameters;
@@ -89,6 +90,8 @@ public class Workspace extends AppWorkspaceComponent {
     Pane firstParent;
     double sliderValueInitial;
     double sliderValueFinal;
+    Rectangle myClip;
+    boolean ignore;
 
     public Workspace(RegioVincoMapEditor initApp) {
 
@@ -111,11 +114,17 @@ public class Workspace extends AppWorkspaceComponent {
         return pb;
     }
 
+    public void setClip(double x, double y) {
+        myClip.setHeight(y);
+        myClip.setWidth(x);
+        firstParent.setClip(myClip);
+    }
+
     public void layoutGUI() {
         workspace = new SplitPane();
         firstParent = new Pane();
         first = new Pane();
-        Rectangle myClip = new Rectangle(802, 536);
+        myClip = new Rectangle(802, 536);
 
         firstParent.setClip(myClip);
         DataManager dataManager = (DataManager) app.getDataComponent();
@@ -141,7 +150,7 @@ public class Workspace extends AppWorkspaceComponent {
 
         itemsTable.setItems(dataManager.getItems());
         second.getChildren().add(itemsTable);
-        itemsTable.minWidthProperty().bind(app.getGUI().getWindow().widthProperty().multiply(.1));
+        itemsTable.minWidthProperty().bind(app.getGUI().getWindow().widthProperty().multiply(.5));
         itemsTable.minHeightProperty().bind(app.getGUI().getWindow().heightProperty().multiply(.9));
     }
 
@@ -152,9 +161,23 @@ public class Workspace extends AppWorkspaceComponent {
 
     public void setupHandlers() {
         MapEditorController controller = new MapEditorController();
+        DataManager dm = (DataManager) app.getDataComponent();
 
         gui.getNewButton().setOnMouseClicked(e -> {
             controller.processNewButton(app);
+        });
+        gui.getSaveButton().setOnMouseClicked(e -> {
+            controller.processSaveButton(app);
+        });
+        gui.getOpenButton().setOnMouseClicked(e -> {
+            try {
+                ignore = true;
+                controller.processOpenButton(app);
+                ignore = false;
+
+            } catch (IOException ex) {
+                System.out.println("errors");
+            }
         });
         Button testLoad = new Button("Load RAW Json(To be done for save testing)");
         gui.getFreePane().getChildren().add(testLoad);
@@ -189,6 +212,7 @@ public class Workspace extends AppWorkspaceComponent {
         gui.getColorButton().valueProperty().addListener(new ChangeListener<Color>() {
             public void changed(ObservableValue<? extends Color> ov, Color old_val, Color new_val) {
                 DataManager dm = (DataManager) app.getDataComponent();
+                app.getGUI().getSaveButton().setDisable(false);
                 dm.setBackgroundColor(new_val.toString());
                 firstParent.setBackground(new Background(new BackgroundFill(Color.valueOf(dm.getBackgroundColor()), CornerRadii.EMPTY, Insets.EMPTY)));
             }
@@ -197,34 +221,17 @@ public class Workspace extends AppWorkspaceComponent {
             public void changed(ObservableValue<? extends Color> ov, Color old_val, Color new_val) {
                 DataManager dm = (DataManager) app.getDataComponent();
                 dm.setBorderColor(new_val.toString());
+                app.getGUI().getSaveButton().setDisable(false);
                 for (int x = 0; x < dm.getItems().size(); x++) {
                     dm.getItems().get(x).getPoly().setStroke(Color.valueOf(dm.getBorderColor()));
                 }
 
             }
         });
-
-        /*     gui.getZoomSlider().setOnMouseDragEntered(e -> {
-            sliderValueInitial = gui.getZoomSlider().getValue();
-            System.out.println(sliderValueInitial);
-        });
-        gui.getZoomSlider().setOnMouseDragExited(e -> {
-            sliderValueFinal = gui.getZoomSlider().getValue();
-            if (sliderValueFinal - sliderValueInitial > 0) {
-                zoom = zoom * (1 + (gui.getZoomSlider().getValue() * .01));
-                zoomIn();
-                zoomOut();
-            }
-            if (sliderValueInitial - sliderValueFinal > 0) {
-                zoom = zoom * (1 - (gui.getZoomSlider().getValue() * .01));
-                zoomIn();
-                zoomOut();
-            }
-            sliderValueInitial = sliderValueFinal;
-        }); */
+        // workspace.get
         itemsTable.getSelectionModel()
                 .selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-                    DataManager dm = (DataManager) app.getDataComponent();
+
                     if (oldSelection != null) {
                         oldSelection.getPoly().setStroke(Paint.valueOf(dm.getBorderColor()));
                     }
@@ -235,48 +242,64 @@ public class Workspace extends AppWorkspaceComponent {
 
                 }
                 );
+        gui.getThickness().valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> ov, Number old_val, Number new_val) {
+                if (!ignore) {
+                    dm.setThickness(new_val.doubleValue() * 2 * .0001);
+                    try {
+                        for (int k = 0; k < dm.getItems().size(); k++) {
+                            dm.getItems().get(k).getPoly().setStrokeWidth(dm.getThickness());
+                        }
+                    } catch (Exception e) {
+                        //Squelch :)
+                    }
+                }
+            }
+        });
         gui.getZoomSlider().valueProperty().addListener(new ChangeListener<Number>() {
 
             public void changed(ObservableValue<? extends Number> ov,
                     Number old_val, Number new_val) {
-                if (new_val.doubleValue() > old_val.doubleValue()) {
-                    zoom = zoom + zoom * .01;
-                    boolean manual = false;
-                    Scale scale = new Scale();
-                    first.getTransforms().clear();
-                    first.setTranslateX(-lowestX * zoom);
-                    first.setTranslateY(highestY * zoom);
-                    scale.setX(zoom);
-                    scale.setY(-zoom);
-                    first.getTransforms().add(scale);
-                }
-                if (new_val.doubleValue() < old_val.doubleValue()) {
-                    zoom = zoom - zoom * .01;
-                    boolean manual = false;
-                    Scale scale = new Scale();
-                    first.getTransforms().clear();
-                    first.setTranslateX(-lowestX * zoom);
-                    first.setTranslateY(highestY * zoom);
-                    scale.setX(zoom);
-                    scale.setY(-zoom);
-                    first.getTransforms().add(scale);
+                if (!ignore) {
+                    app.getGUI().getSaveButton().setDisable(false);
+                    if (new_val.doubleValue() > old_val.doubleValue()) {
+                        zoom = zoom + zoom * .01;
+                        boolean manual = false;
+                        Scale scale = new Scale();
+                        first.getTransforms().clear();
+                        first.setTranslateX(-lowestX * zoom);
+                        first.setTranslateY(highestY * zoom);
+                        scale.setX(zoom);
+                        scale.setY(-zoom);
+                        first.getTransforms().add(scale);
+                    }
+                    if (new_val.doubleValue() < old_val.doubleValue()) {
+                        zoom = zoom - zoom * .01;
+                        boolean manual = false;
+                        Scale scale = new Scale();
+                        first.getTransforms().clear();
+                        first.setTranslateX(-lowestX * zoom);
+                        first.setTranslateY(highestY * zoom);
+                        scale.setX(zoom);
+                        scale.setY(-zoom);
+                        first.getTransforms().add(scale);
 
+                    }
+                    dm.setZoom(zoom);
                 }
             }
         });
-        /*    gui.getZoomSlider().setOnMouseDragged(e -> {
-            zoom = zoom * (1 - (gui.getZoomSlider().getValue() * .01));
-            zoomIn();
-            zoomOut();
-        }); */
         gui.getRenameButton().setOnMouseClicked(e -> {
             renameDialog myDiag = renameDialog.getSingleton();
             Stage newStage = new Stage();
-            DataManager dm = (DataManager) app.getDataComponent();
+
             myDiag.init(newStage, dm.getName());
 
             myDiag.show("Rename Map");
             if (myDiag.getSelection().equalsIgnoreCase("yes")) {
+                if (!dm.getName().equalsIgnoreCase(myDiag.getRename())) {
+                    app.getGUI().getSaveButton().setDisable(false);
+                }
                 dm.setName(myDiag.getRename());
                 String anthemPath = dm.getParent() + "/" + dm.getName() + "/" + dm.getName() + " National Anthem.mid";
                 File anthemFile = new File(anthemPath);
@@ -312,7 +335,6 @@ public class Workspace extends AppWorkspaceComponent {
                 moveLeft();
             }
             if (e.getCode().equals(KeyCode.UP)) {
-                System.out.println("iran");
                 moveUp();
             }
             if (e.getCode().equals(KeyCode.DOWN)) {
@@ -360,25 +382,10 @@ public class Workspace extends AppWorkspaceComponent {
                 // zoomOut(manual);
             }
         });
-        firstParent.setOnMouseClicked(e -> {
-            System.out.println("firstparent X: " + e.getX() + " Y: " + e.getY());
-        });
-        first.setOnMouseClicked(e -> {
-
-        });
         itemsTable.setOnMouseClicked(e -> {
 
             if (e.getClickCount() == 2) {
                 editItem();
-                /*
-                if (itemsTable.getSelectionModel().getSelectedItem() != null) {
-
-                    String x = controller.processEditItem(itemsTable.getSelectionModel().getSelectedItem(), app);
-                    if (x.equalsIgnoreCase("right")) {
-                        itemsTable.getSelectionModel().selectNext();
-                        itemsTable.
-                    }
-                } */
             }
 
         });
@@ -417,22 +424,25 @@ public class Workspace extends AppWorkspaceComponent {
         Scale scale = new Scale();
         diffX = highestX - lowestX;
         diffY = highestY - lowestY;
-        if (diffX > diffY) {
-            //zoom = 137.149-.374803*diffX;//135, 2.22;
-            //EXPONENTIAL SCALE
+        DataManager dm = (DataManager) app.getDataComponent();
+        if (dm.getZoom() == 0) {
+            if (diffX > diffY) {
+                //zoom = 137.149-.374803*diffX;//135, 2.22;
+                //EXPONENTIAL SCALE
 
-            zoom = 767.8464 * (Math.pow(diffX, -.9953849));
-            // 360 = 2.22
-            //5.733737945556754 = 135
-            //0.11345863342279472 = 6700
-        }
-        if (diffY > diffX) {
-            zoom = 6716.945547 * (Math.pow(diffY, -.022264));
+                zoom = 767.8464 * (Math.pow(diffX, -.9953849));
+                dm.setZoom(zoom);
+                // 360 = 2.22
+                //5.733737945556754 = 135
+                //0.11345863342279472 = 6700
+            }
+            if (diffY > diffX) {
+                zoom = 767.8464 * (Math.pow(diffX, -.9953849));
+                dm.setZoom(zoom);
+            }
+
         }
 
-        System.out.println("Zoom: " + zoom);
-        System.out.println("Lowest X: " + lowestX);
-        System.out.println("DiffX: " + diffX);
         first.setTranslateX(-lowestX * zoom);
         first.setTranslateY(highestY * zoom);
         scale.setX(zoom);
@@ -468,11 +478,13 @@ public class Workspace extends AppWorkspaceComponent {
 
             }
             myGon.setStroke(Color.valueOf(dataManager.getBorderColor()));
+            myGon.setStrokeWidth(dataManager.getThickness());
             dataManager.getItems().get(i).setPoly(myGon);
             myGon.setOnMouseClicked(e -> {
                 for (int j = 0; j < dataManager.getItems().size(); j++) {
                     if (dataManager.getItems().get(j).getPoly().equals(myGon)) {
                         itemsTable.getSelectionModel().select(dataManager.getItems().get(j));
+                        myGon.toFront();
                         if (e.getClickCount() == 2) {
                             MapEditorController controller = new MapEditorController();
                             controller.processEditItem(itemsTable.getSelectionModel().getSelectedItem(), app);
@@ -522,14 +534,12 @@ public class Workspace extends AppWorkspaceComponent {
         highestX = -900;
         diffX = 0;
         diffY = 0;
-        sliderValueInitial = gui.getZoomSlider().getValue();
+        gui.getThickness().setValue((dataManager.getThickness() * 10000) / 2);
+        gui.getZoomSlider().setValue(50);
+        zoom = dataManager.getZoom();
         layoutMap();
         fixLayout();
         firstParent.setBackground(new Background(new BackgroundFill(Color.valueOf(dataManager.getBackgroundColor()), CornerRadii.EMPTY, Insets.EMPTY)));
-
-    }
-
-    public void center() {
 
     }
 
@@ -559,55 +569,4 @@ public class Workspace extends AppWorkspaceComponent {
         first.setTranslateY(-6 + first.getTranslateY());
     }
 
-    public void zoomIn(boolean manual) {
-        //we grab the xlocation and ylocation in reference to our "center"
-        /* xloc = (int) (e.getX() - app.getGUI().getWindow().getWidth() / 2);
-        yloc = (int) (e.getY() - app.getGUI().getWindow().getHeight() / 2);
-        //we move the screen to the clicked location
-        counterRight = counterRight + xloc;
-        counterUp = counterUp - yloc;
-        first.setTranslateX(-10 - counterRight + app.getGUI().getWindow().getWidth() / 2);
-        first.setTranslateY(6 + counterUp + app.getGUI().getWindow().getHeight() / 2); 
-        //we remove all zoom effects, and then apply a new zoom based on counterzoom */
-        if (manual) {
-            first.getTransforms().clear();
-            Scale scale = new Scale();
-            counterZoom--;
-            zoom = zoom * .001;
-            scale.setX(zoom);
-            scale.setY(-zoom);
-            first.getTransforms().add(scale);
-        } else {
-            first.getTransforms().clear();
-            Scale scale = new Scale();
-            //we increment counterZoom every time we zoom
-            counterZoom++;
-
-            scale.setX(zoom);
-            scale.setY(-zoom);
-            first.getTransforms().add(scale);
-            System.out.println("zooming in");
-        }
-    }
-
-    public void zoomOut(boolean manual) {
-        //siimilar to zoomIn(), but we don't move the camera, and we decrement counterZoom
-        System.out.println("zooming out" + zoom);
-        if (manual) {
-            first.getTransforms().clear();
-            Scale scale = new Scale();
-            counterZoom--;
-            zoom = zoom * .001;
-            scale.setX(zoom);
-            scale.setY(-zoom);
-            first.getTransforms().add(scale);
-        } else {
-            first.getTransforms().clear();
-            Scale scale = new Scale();
-            counterZoom--;
-            scale.setX(zoom);
-            scale.setY(-zoom);
-            first.getTransforms().add(scale);
-        }
-    }
 }
