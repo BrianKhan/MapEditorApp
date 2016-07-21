@@ -5,9 +5,11 @@
  */
 package rgvm.gui;
 
+import audio_manager.AudioManager;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
@@ -44,6 +46,13 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
+import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MidiSystem;
+import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Sequence;
+import javax.sound.midi.Sequencer;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import properties_manager.PropertiesManager;
 import rgvm.PropertyType;
 import saf.components.AppWorkspaceComponent;
@@ -92,13 +101,14 @@ public class Workspace extends AppWorkspaceComponent {
     double sliderValueFinal;
     Rectangle myClip;
     boolean ignore;
+    Sequence audio;
+    Sequencer sqr;
 
     public Workspace(RegioVincoMapEditor initApp) {
 
         app = initApp;
         gui = app.getGUI();
         layoutGUI();
-
         workspace.setDividerPosition(0, .885);
         setupHandlers();
         FlowPane progPane = new FlowPane();
@@ -124,9 +134,7 @@ public class Workspace extends AppWorkspaceComponent {
         workspace = new SplitPane();
         firstParent = new Pane();
         first = new Pane();
-        myClip = new Rectangle(802, 536);
 
-        firstParent.setClip(myClip);
         DataManager dataManager = (DataManager) app.getDataComponent();
 
         second = new FlowPane();
@@ -179,44 +187,87 @@ public class Workspace extends AppWorkspaceComponent {
                 System.out.println("errors");
             }
         });
-        Button testLoad = new Button("Load RAW Json(To be done for save testing)");
-        gui.getFreePane().getChildren().add(testLoad);
-        testLoad.setOnMouseClicked(e -> {
-            first.getChildren().clear();
-            controller.processLoadTest(app);
-        });
-        Button testSave = new Button("Save to RVME with current RVM file loaded +hard coded values");
-        gui.getFreePane().getChildren().add(testSave);
-        testSave.setOnMouseClicked(e -> {
-            controller.processSaveTest(app);
-        });
-        Button testLoader = new Button("Load RVME file with print statements");
-        gui.getFreePane().getChildren().add(testLoader);
-        testLoader.setOnMouseClicked(e -> {
-            controller.processLoadBig(app);
-        });
-        Button testExport = new Button("Export to RVM file");
-        gui.getFreePane().getChildren().add(testExport);
-        testExport.setOnMouseClicked(e -> {
-            controller.processExportTest(app);
-        });
-        gui.getThickness().addEventFilter(KeyEvent.ANY, e -> {
+        gui.getPlayButton().setOnMouseClicked(e -> {
+            String anthemPath = dm.getParent() + "/" + dm.getName() + "/" + dm.getName() + " National Anthem.mid";
+            File anthemFile = new File(anthemPath);
+            if (anthemFile.exists()) {
+                try {
+                    if (sqr.isRunning()) {
+                        sqr.stop();
+                    } else {
+                        audio = MidiSystem.getSequence(anthemFile);
+                        sqr.setSequence(audio);
+                        sqr.start();
 
-            e.consume();
-            first.requestFocus();
+                    }
+                } catch (InvalidMidiDataException ex) {
+                    Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
         });
-        gui.getZoomSlider().addEventFilter(KeyEvent.ANY, e -> {
-            e.consume();
-            first.requestFocus();
-        });
+        gui.getZoomSlider()
+                .setOnMouseReleased(e -> {
+                    ignore = true;
+                    gui.getZoomSlider().setValue(50);
+                    ignore = false;
+                }
+                );
+        gui.getResizeButton()
+                .setOnMouseClicked(e -> {
+                    controller.processResizeButton(app);
+                    myClip.setHeight(dm.getHeight());
+                    myClip.setWidth(dm.getWidth());
+                    firstParent.setClip(myClip);
+                }
+                );
+        gui.getReassignButton()
+                .setOnMouseClicked(e -> {
+                    if (dm.getItems().size() < 256) {
+                        Random rand = new Random();
+                        int rnd;
+                        boolean[] check = new boolean[254];
+                        for (int i = 0; i < dm.getItems().size(); i++) {
+                            rnd = rand.nextInt(254);
+                            while (check[rnd] || rnd == 0) {
+                                rnd = rand.nextInt(254);
+                            }
+                            check[rnd] = true;
+                            dm.getItems().get(i).setRed(rnd);
+                            dm.getItems().get(i).setBlue(rnd);
+                            dm.getItems().get(i).setGreen(rnd);
+                            String hex = String.format("#%02x%02x%02x", dm.getItems().get(i).getRed(), dm.getItems().get(i).getGreen(), dm.getItems().get(i).getBlue());
+                            dm.getItems().get(i).getPoly().setFill(Color.valueOf(hex));
+                        }
+                    }
+                }
+                );
+
+        gui.getThickness()
+                .addEventFilter(KeyEvent.ANY, e -> {
+
+                    e.consume();
+                    first.requestFocus();
+                }
+                );
+        gui.getZoomSlider()
+                .addEventFilter(KeyEvent.ANY, e -> {
+                    e.consume();
+                    first.requestFocus();
+                }
+                );
         gui.getColorButton().valueProperty().addListener(new ChangeListener<Color>() {
+
             public void changed(ObservableValue<? extends Color> ov, Color old_val, Color new_val) {
                 DataManager dm = (DataManager) app.getDataComponent();
                 app.getGUI().getSaveButton().setDisable(false);
                 dm.setBackgroundColor(new_val.toString());
                 firstParent.setBackground(new Background(new BackgroundFill(Color.valueOf(dm.getBackgroundColor()), CornerRadii.EMPTY, Insets.EMPTY)));
             }
-        });
+        }
+        );
         gui.getBorderColorButton().valueProperty().addListener(new ChangeListener<Color>() {
             public void changed(ObservableValue<? extends Color> ov, Color old_val, Color new_val) {
                 DataManager dm = (DataManager) app.getDataComponent();
@@ -315,11 +366,6 @@ public class Workspace extends AppWorkspaceComponent {
                 System.out.println("new Flag Path: " + dm.getParent() + "/" + dm.getName() + "/" + dm.getName() + " Flag.png");
                 System.out.println("new Seal Path: " + dm.getParent() + "/" + dm.getName() + "/" + dm.getName() + " Seal.png");
             }
-        });
-        Button testJunit = new Button("Choose file and execute test");
-        gui.getFreePane().getChildren().add(testJunit);
-        testJunit.setOnMouseClicked(e -> {
-            controller.test(app);
         });
         first.setOnMouseClicked(e -> {
             first.requestFocus();
@@ -534,11 +580,28 @@ public class Workspace extends AppWorkspaceComponent {
         highestX = -900;
         diffX = 0;
         diffY = 0;
+        try {
+            sqr = MidiSystem.getSequencer();
+            if (sqr == null) {
+                // Error -- sequencer device is not supported.
+                // Inform user and return...
+            } else {
+                // Acquire resources and make operational.
+                sqr.open();
+            }
+        } catch (MidiUnavailableException ex) {
+            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         gui.getThickness().setValue((dataManager.getThickness() * 10000) / 2);
         gui.getZoomSlider().setValue(50);
         zoom = dataManager.getZoom();
         layoutMap();
         fixLayout();
+
+        myClip = new Rectangle(dataManager.getWidth(), dataManager.getHeight());
+
+        firstParent.setClip(myClip);
         firstParent.setBackground(new Background(new BackgroundFill(Color.valueOf(dataManager.getBackgroundColor()), CornerRadii.EMPTY, Insets.EMPTY)));
 
     }

@@ -25,6 +25,7 @@ import rgvm.data.RegionItem;
 import rgvm.dialog.ColorDialog;
 import rgvm.dialog.EditDialog;
 import rgvm.dialog.NewDialog;
+import rgvm.dialog.ResizeDialog;
 import rgvm.file.FileManager;
 import rgvm.gui.Workspace;
 import static saf.settings.AppPropertyType.LOAD_WORK_TITLE;
@@ -66,53 +67,54 @@ public class MapEditorController {
         fc.getExtensionFilters().addAll(
                 new ExtensionFilter("Regio Vinco Map Editor File", "*.rvme"));
         File selectedFile = fc.showOpenDialog(app.getGUI().getWindow());
-
-        FileManager fm = (FileManager) app.getFileComponent();
-        Workspace work = (Workspace) app.getWorkspaceComponent();
-        app.getDataComponent().reset();
-        DataManager dm = (DataManager) app.getDataComponent();
-        fm.openData(app.getDataComponent(), selectedFile.getAbsolutePath());
-        app.getGUI().getSaveButton().setDisable(true);
-        app.getGUI().getThickness().setDisable(false);
-        app.getGUI().getZoomSlider().setDisable(false);
-        app.getGUI().getColorButton().setDisable(false);
-        app.getGUI().getSaveButton().setDisable(false);
-        app.getGUI().getExportButton().setDisable(false);
-        app.getGUI().getRenameButton().setDisable(false);
-        app.getGUI().getAddButton().setDisable(false);
-        // app.getGUI().getRemoveButton().setDisable(false);
-        app.getGUI().getBackgroundButton().setDisable(false);
-        app.getGUI().getBorderColorButton().setDisable(false);
-        app.getGUI().getReassignButton().setDisable(false);
-        app.getGUI().getResizeButton().setDisable(false);
-        System.out.println("Name: " + dm.getName());
-        System.out.println("PD: " + dm.getParent());
-        System.out.println("DD: " + dm.getRawPath());
-        String anthemPath = dm.getParent() + "/" + dm.getName() + "/" + dm.getName() + " National Anthem.mid";
-        File anthemFile = new File(anthemPath);
-        if (anthemFile.exists()) {
-            System.out.println("Found anthem file: " + anthemPath);
-            app.getGUI().getPlayButton().setDisable(false);
-        } else {
-            System.out.println("Did not find anthem file: " + anthemPath);
-        }
-        app.getWorkspaceComponent().reloadWorkspace();
-        for (int i = 0; i < dm.getItems().size(); i++) {
-            RegionItem item = dm.getItems().get(i);
-            item.setLeaderPath(dm.getParent() + "/" + dm.getName() + "/" + item.getLeader() + ".png");
-            item.setFlagPath(dm.getParent() + "/" + dm.getName() + "/" + item.getName() + " Flag.png");
-            if (dm.getItems().size() > 255) {
-
+        if (selectedFile != null) {
+            FileManager fm = (FileManager) app.getFileComponent();
+            Workspace work = (Workspace) app.getWorkspaceComponent();
+            app.getDataComponent().reset();
+            DataManager dm = (DataManager) app.getDataComponent();
+            fm.openData(app.getDataComponent(), selectedFile.getAbsolutePath());
+            app.getGUI().getSaveButton().setDisable(true);
+            app.getGUI().getThickness().setDisable(false);
+            app.getGUI().getZoomSlider().setDisable(false);
+            app.getGUI().getColorButton().setDisable(false);
+            app.getGUI().getSaveButton().setDisable(false);
+            app.getGUI().getExportButton().setDisable(false);
+            app.getGUI().getRenameButton().setDisable(false);
+            app.getGUI().getAddButton().setDisable(false);
+            // app.getGUI().getRemoveButton().setDisable(false);
+            app.getGUI().getBackgroundButton().setDisable(false);
+            app.getGUI().getBorderColorButton().setDisable(false);
+            app.getGUI().getReassignButton().setDisable(false);
+            app.getGUI().getResizeButton().setDisable(false);
+            System.out.println("Name: " + dm.getName());
+            System.out.println("PD: " + dm.getParent());
+            System.out.println("DD: " + dm.getRawPath());
+            String anthemPath = dm.getParent() + "/" + dm.getName() + "/" + dm.getName() + " National Anthem.mid";
+            File anthemFile = new File(anthemPath);
+            if (anthemFile.exists()) {
+                System.out.println("Found anthem file: " + anthemPath);
+                app.getGUI().getPlayButton().setDisable(false);
             } else {
-
-                String hex = String.format("#%02x%02x%02x", dm.getItems().get(i).getRed(), dm.getItems().get(i).getGreen(), dm.getItems().get(i).getBlue());
-                dm.getItems().get(i).getPoly().setFill(Paint.valueOf(hex));
-                dm.getItems().get(i).getPoly().setStrokeWidth(dm.getThickness());
-                // System.out.println("Grey value for index " +i+" " +hex);
+                System.out.println("Did not find anthem file: " + anthemPath);
             }
+            app.getWorkspaceComponent().reloadWorkspace();
+            for (int i = 0; i < dm.getItems().size(); i++) {
+                RegionItem item = dm.getItems().get(i);
+                item.setLeaderPath(dm.getParent() + "/" + dm.getName() + "/" + item.getLeader() + ".png");
+                item.setFlagPath(dm.getParent() + "/" + dm.getName() + "/" + item.getName() + " Flag.png");
+                if (dm.getItems().size() > 255) {
+
+                } else {
+
+                    String hex = String.format("#%02x%02x%02x", dm.getItems().get(i).getRed(), dm.getItems().get(i).getGreen(), dm.getItems().get(i).getBlue());
+                    dm.getItems().get(i).getPoly().setFill(Paint.valueOf(hex));
+                    dm.getItems().get(i).getPoly().setStrokeWidth(dm.getThickness());
+                    // System.out.println("Grey value for index " +i+" " +hex);
+                }
+            }
+            app.getGUI().getColorButton().setValue(Color.valueOf(dm.getBackgroundColor()));
+            app.getGUI().getBorderColorButton().setValue(Color.valueOf(dm.getBorderColor()));
         }
-        app.getGUI().getColorButton().setValue(Color.valueOf(dm.getBackgroundColor()));
-        app.getGUI().getBorderColorButton().setValue(Color.valueOf(dm.getBorderColor()));
     }
 
     public void processNewButton(RegioVincoMapEditor app) {
@@ -387,6 +389,24 @@ public class MapEditorController {
         }
         Workspace work = (Workspace) app.getWorkspaceComponent();
         work.reloadWorkspace();
+    }
+
+    public void processResizeButton(RegioVincoMapEditor app) {
+        DataManager dm = (DataManager) app.getDataComponent();
+        ResizeDialog myDiag = ResizeDialog.getSingleton();
+        Stage newStage = new Stage();
+        myDiag.init(newStage, dm.getHeight(), dm.getWidth());
+        myDiag.show("Choose Dimensions");
+        if (myDiag.getSelection().equalsIgnoreCase("yes")) {
+            try {
+                dm.setHeight(Double.valueOf(myDiag.getResizeHeight()));
+                dm.setWidth(Double.valueOf(myDiag.getResizeWidth()));
+            } catch (Exception e) {
+                AppMessageDialogSingleton single = AppMessageDialogSingleton.getSingleton();
+                single.show("error", "Please make sure you have entered a digit value");
+            }
+
+        }
     }
 
 }
