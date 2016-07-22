@@ -67,6 +67,8 @@ public class FileManager implements AppFileComponent {
         dm.setRawPath(json.getString("RAW_PATH").replace("\\", "/"));
         dm.setBigFlagPath(json.getString("BIG_FLAG_PATH"));
         dm.setSealPath(json.getString("SEAL_PATH"));
+        dm.setX(json.getJsonNumber("X").doubleValue());
+        dm.setY(json.getJsonNumber("Y").doubleValue());
         JsonArray jsonRegionArray = json.getJsonArray("REGION");
         
         for (int i = 0; i < jsonRegionArray.size(); i++) {
@@ -83,55 +85,6 @@ public class FileManager implements AppFileComponent {
             JsonArray jsonSecond = jsonRegion.getJsonArray("POINTS");
             for (int j = 0; j < jsonSecond.size(); j++) {
                 JsonObject myItem = jsonSecond.getJsonObject(j);
-                double x = myItem.getJsonNumber("X").doubleValue();
-                double y = myItem.getJsonNumber("Y").doubleValue();
-                region.add(x, y);
-            }
-            dm.addItem(region);
-        }
-    }
-
-    public void loadRVME(AppDataComponent data, String filePath) throws IOException {
-        DataManager dm = (DataManager) data;
-        dm.reset();
-        JsonObject json = loadJSONFile(filePath);
-        dm.setName(json.getString("MAP_NAME"));
-        System.out.println(json.getString("MAP_NAME"));
-        dm.setParent(json.getString("PARENT_DIRECTORY"));
-        System.out.println(json.getString("PARENT_DIRECTORY"));
-        dm.setWidth(json.getJsonNumber("WIDTH").doubleValue());
-        System.out.println(json.getJsonNumber("WIDTH"));
-        dm.setHeight(json.getJsonNumber("HEIGHT").doubleValue());
-        System.out.println(json.getJsonNumber("HEIGHT"));
-        dm.setThickness(json.getJsonNumber("BORDER_THICKNESS").doubleValue());
-        System.out.println(json.getJsonNumber("BORDER_THICKNESS"));
-        dm.setZoom(json.getJsonNumber("ZOOM").doubleValue());
-        System.out.println(json.getJsonNumber("ZOOM"));
-        dm.setBackgroundColor(json.getString("BACKGROUND_COLOR"));
-        System.out.println(json.getJsonNumber("BACKGROUND_COLOR"));
-        dm.setBorderColor(json.getString("BORDER_COLOR"));
-        System.out.println(json.getJsonNumber("BORDER_COLOR"));
-        dm.setRawPath(json.getString("RAW_PATH"));
-        System.out.println(json.getString("RAW_PATH"));
-        dm.setBigFlagPath(json.getString("BIG_FLAG_PATH"));
-        System.out.println(json.getString("BIG_FLAG_PATH"));
-        dm.setSealPath(json.getString("SEAL_PATH"));
-        System.out.println(json.getString("SEAL_PATH"));
-        JsonArray jsonRegionArray = json.getJsonArray("REGION");
-        for (int i = 0; i < jsonRegionArray.size(); i++) {
-            JsonObject jsonRegion = jsonRegionArray.getJsonObject(i);
-            RegionItem region = new RegionItem();
-            region.setName(jsonRegion.getString("NAME"));
-            region.setLeader(jsonRegion.getString("LEADER"));
-            region.setCapital(jsonRegion.getString("CAPITAL"));
-            region.setFlagPath(jsonRegion.getString("FLAG_PATH"));
-            region.setLeaderPath(jsonRegion.getString("LEADER_PATH"));
-            region.setRed(jsonRegion.getJsonNumber("RED").intValue());
-            region.setBlue(jsonRegion.getJsonNumber("BLUE").intValue());
-            region.setGreen(jsonRegion.getJsonNumber("GREEN").intValue());
-            JsonArray jsonSecond = jsonRegion.getJsonArray("POINTS");
-            for (int j = 0; j < jsonSecond.size(); j++) {
-                JsonObject myItem = jsonSecond.getJsonObject(i);
                 double x = myItem.getJsonNumber("X").doubleValue();
                 double y = myItem.getJsonNumber("Y").doubleValue();
                 region.add(x, y);
@@ -249,6 +202,8 @@ public class FileManager implements AppFileComponent {
                 .add("RAW_PATH", manager.getRawPath())
                 .add("BIG_FLAG_PATH", manager.getBigFlagPath())
                 .add("SEAL_PATH", manager.getSealPath())
+                .add("X", manager.getX())
+                .add("Y",manager.getY())
                 .add("REGION", itemsArray).build();
 
         //output the file

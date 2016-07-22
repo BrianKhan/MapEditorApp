@@ -31,6 +31,8 @@ public class DataManager implements AppDataComponent {
     boolean hasCapital;
     boolean hasLeader;
     boolean hasFlag;
+    double x;
+    double y;
 
     public DataManager(RegioVincoMapEditor initApp) {
         app = initApp;
@@ -47,6 +49,8 @@ public class DataManager implements AppDataComponent {
         height = null;
         borderThickness = 0;
         zoom = 0;
+        x = 0;
+        y = 0;
         backgroundColor = "#000000";
         borderColor = "#000000";
         rawPath = null;
@@ -86,6 +90,18 @@ public class DataManager implements AppDataComponent {
     public void setProgress(double progress) {
         workspace = (Workspace) app.getWorkspaceComponent();
         workspace.getPB().setProgress(progress);
+    }
+    public void setX(double xx) {
+        x = xx;
+    }
+    public void setY(double yy) {
+        y = yy;
+    }
+    public double getX() {
+        return x;
+    }
+    public double getY() {
+        return y;
     }
 
     public ProgressBar getPB() {

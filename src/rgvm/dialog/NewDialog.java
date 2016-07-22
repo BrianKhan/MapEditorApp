@@ -101,8 +101,7 @@ public class NewDialog extends Stage {
         props = PropertiesManager.getPropertiesManager();
         YES = props.getProperty(PropertyType.YES);
         NO = props.getProperty(PropertyType.NO);
-        
-        
+
     }
 
     /**
@@ -176,7 +175,7 @@ public class NewDialog extends Stage {
         //TODO string literals
         nameBox.getChildren().add(new Label("Parent Directory: "));
         nameBox.getChildren().add(parentField = new TextField("Parent Directory"));
-        
+
         parentField.setDisable(true);
         Button directButton = new Button("Choose Parent Directory");
         nameBox.getChildren().add(directButton);
@@ -220,7 +219,7 @@ public class NewDialog extends Stage {
                     new FileChooser.ExtensionFilter("JSON File", "*.json"));
             File dc = myChoose.showOpenDialog(myStage);
             if (dc != null) {
-                
+
                 String s1 = dc.getAbsolutePath();
                 String s2 = fil.getAbsolutePath();
 
@@ -312,6 +311,10 @@ public class NewDialog extends Stage {
         // AND OPEN UP THIS DIALOG, MAKING SURE THE APPLICATION
         // WAITS FOR IT TO BE RESOLVED BEFORE LETTING THE USER
         // DO MORE WORK.
-        showAndWait();
+        try {
+            showAndWait();
+        } catch (IllegalStateException e) {
+
+        }
     }
 }

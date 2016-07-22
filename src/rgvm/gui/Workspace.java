@@ -215,20 +215,28 @@ public class Workspace extends AppWorkspaceComponent {
             directChoose.setTitle("Directory to save RVM and PNG file");
             File fil = new File("./export");
             directChoose.setInitialDirectory(fil);
-            String dcPath = directChoose.showDialog(app.getGUI().getWindow()).getAbsolutePath();
-            String mdcPath = dcPath +"/"+ dm.getName() + ".png";
-            System.out.println("Saving png file as: " + mdcPath);
-            WritableImage img = firstParent.snapshot(new SnapshotParameters(), null);
-            File image = new File(mdcPath);
+            String dcPath;
+                try {
+                dcPath = directChoose.showDialog(app.getGUI().getWindow()).getAbsolutePath();
+                }
+                catch(NullPointerException ee) {
+                    dcPath = null;
+                }
+                if (dcPath != null) {
+                String mdcPath = dcPath + "/" + dm.getName() + ".png";
+                System.out.println("Saving png file as: " + mdcPath);
+                WritableImage img = firstParent.snapshot(new SnapshotParameters(), null);
+                File image = new File(mdcPath);
 
-            try {
-                ImageIO.write(SwingFXUtils.fromFXImage(img, null), "png", image);
-                System.out.println("image write successful");
-            } catch (IOException ex) {
-                Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+                try {
+                    ImageIO.write(SwingFXUtils.fromFXImage(img, null), "png", image);
+                    System.out.println("image write successful");
+                } catch (IOException ex) {
+                    Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                String absPath = dcPath + "/" + dm.getName() + ".rvm";
+                controller.processExportButton(app, absPath);
             }
-            String absPath = dcPath + "/" + dm.getName() +".rvm";
-            controller.processExportButton(app, absPath);
 
         });
 
@@ -333,6 +341,7 @@ public class Workspace extends AppWorkspaceComponent {
                 );
         gui.getReassignButton()
                 .setOnMouseClicked(e -> {
+                    gui.getSaveButton().setDisable(false);
                     gui.getRemoveButton().setDisable(true);
                     if (dm.getItems().size() < 256) {
                         Random rand = new Random();
@@ -380,6 +389,7 @@ public class Workspace extends AppWorkspaceComponent {
         gui.getBorderColorButton().valueProperty().addListener(new ChangeListener<Color>() {
             public void changed(ObservableValue<? extends Color> ov, Color old_val, Color new_val) {
                 DataManager dm = (DataManager) app.getDataComponent();
+                app.getGUI().getSaveButton().setDisable(false);
                 dm.setBorderColor(new_val.toString());
                 app.getGUI().getSaveButton().setDisable(false);
                 for (int x = 0; x < dm.getItems().size(); x++) {
@@ -405,6 +415,7 @@ public class Workspace extends AppWorkspaceComponent {
         gui.getThickness().valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> ov, Number old_val, Number new_val) {
                 if (!ignore) {
+                    app.getGUI().getSaveButton().setDisable(false);
                     dm.setThickness(new_val.doubleValue() * 2 * .0001);
                     try {
                         for (int k = 0; k < dm.getItems().size(); k++) {
@@ -415,6 +426,9 @@ public class Workspace extends AppWorkspaceComponent {
                     }
                 }
             }
+        });
+        gui.getZoomSlider().setOnMouseClicked(e -> {
+            System.out.println("Zoom: " + zoom);
         });
         gui.getZoomSlider().valueProperty().addListener(new ChangeListener<Number>() {
 
@@ -429,6 +443,8 @@ public class Workspace extends AppWorkspaceComponent {
                         first.getTransforms().clear();
                         first.setTranslateX(-lowestX * zoom);
                         first.setTranslateY(highestY * zoom);
+                        dm.setX(first.getTranslateX());
+                        dm.setY(first.getTranslateY());
                         scale.setX(zoom);
                         scale.setY(-zoom);
                         first.getTransforms().add(scale);
@@ -440,11 +456,14 @@ public class Workspace extends AppWorkspaceComponent {
                         first.getTransforms().clear();
                         first.setTranslateX(-lowestX * zoom);
                         first.setTranslateY(highestY * zoom);
+                        dm.setX(first.getTranslateX());
+                        dm.setY(first.getTranslateY());
                         scale.setX(zoom);
                         scale.setY(-zoom);
                         first.getTransforms().add(scale);
 
                     }
+                    app.getGUI().getSaveButton().setDisable(false);
                     dm.setZoom(zoom);
                 }
             }
@@ -539,10 +558,12 @@ public class Workspace extends AppWorkspaceComponent {
             String x = controller.processEditItem(itemsTable.getSelectionModel().getSelectedItem(), app);
             if (x.equalsIgnoreCase("right")) {
                 itemsTable.getSelectionModel().selectNext();
+                gui.getSaveButton().setDisable(false);
                 editItem();
             }
             if (x.equalsIgnoreCase("left")) {
                 itemsTable.getSelectionModel().selectPrevious();
+                gui.getSaveButton().setDisable(false);
                 editItem();
             }
         }
@@ -570,7 +591,6 @@ public class Workspace extends AppWorkspaceComponent {
             if (diffX > diffY) {
                 //zoom = 137.149-.374803*diffX;//135, 2.22;
                 //EXPONENTIAL SCALE
-
                 zoom = 767.8464 * (Math.pow(diffX, -.9953849));
                 dm.setZoom(zoom);
                 // 360 = 2.22
@@ -578,14 +598,20 @@ public class Workspace extends AppWorkspaceComponent {
                 //0.11345863342279472 = 6700
             }
             if (diffY > diffX) {
-                zoom = 767.8464 * (Math.pow(diffX, -.9953849));
+                zoom = 767.8464 * (Math.pow(diffY, -.9953849));
                 dm.setZoom(zoom);
+
             }
 
         }
-
-        first.setTranslateX(-lowestX * zoom);
-        first.setTranslateY(highestY * zoom);
+        if (dm.getX() == 0 && dm.getY() == 0) {
+            first.setTranslateX(-lowestX * zoom);
+            dm.setX(first.getTranslateX());
+            first.setTranslateY(highestY * zoom);
+            dm.setY(first.getTranslateY());
+        }
+        first.setTranslateX(dm.getX());
+        first.setTranslateY(dm.getY());
         scale.setX(zoom);
         scale.setY(-zoom);
         first.getTransforms().add(scale);
@@ -693,6 +719,7 @@ public class Workspace extends AppWorkspaceComponent {
 
         gui.getThickness().setValue((dataManager.getThickness() * 10000) / 2);
         gui.getZoomSlider().setValue(50);
+
         zoom = dataManager.getZoom();
         layoutMap();
         fixLayout();
@@ -708,6 +735,9 @@ public class Workspace extends AppWorkspaceComponent {
         //simply move the camera 5 pixels to the right
         counterRight = counterRight + 5;
         first.setTranslateX(-10 + first.getTranslateX());
+        DataManager dm = (DataManager) app.getDataComponent();
+        dm.setX(first.getTranslateX());
+        app.getGUI().getSaveButton().setDisable(false);
 
     }
 
@@ -715,6 +745,9 @@ public class Workspace extends AppWorkspaceComponent {
         //simply move the camera 5 pixels to the left
         counterRight = counterRight - 5;
         first.setTranslateX(10 + first.getTranslateX());
+        DataManager dm = (DataManager) app.getDataComponent();
+        dm.setX(first.getTranslateX());
+        app.getGUI().getSaveButton().setDisable(false);
 
     }
 
@@ -722,12 +755,18 @@ public class Workspace extends AppWorkspaceComponent {
         //simply move the camera 5 pixels to the up
         counterUp = counterUp + 5;
         first.setTranslateY(6 + first.getTranslateY());
+        DataManager dm = (DataManager) app.getDataComponent();
+        dm.setX(first.getTranslateY());
+        app.getGUI().getSaveButton().setDisable(false);
     }
 
     public void moveDown() {
         //simply move the camera 5 pixels to the down
         counterUp = counterUp - 5;
         first.setTranslateY(-6 + first.getTranslateY());
+        DataManager dm = (DataManager) app.getDataComponent();
+        dm.setX(first.getTranslateY());
+        app.getGUI().getSaveButton().setDisable(false);
     }
 
 }
