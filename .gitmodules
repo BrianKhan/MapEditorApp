@@ -1,3 +1,6 @@
 [submodule "simpleappframework"]
 	path = simpleappframework
 	url = https://github.com/BrianKhan/SimpleAppFrameWork
+[submodule "JavaXJson"]
+	path = JavaXJson
+	url = https://github.com/BrianKhan/JavaXJson
