@@ -1,0 +1,3 @@
+[submodule "simpleappframework"]
+	path = simpleappframework
+	url = https://github.com/BrianKhan/SimpleAppFrameWork
