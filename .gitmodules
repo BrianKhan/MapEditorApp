@@ -10,3 +10,6 @@
 [submodule "XMLUtilities"]
 	path = XMLUtilities
 	url = https://github.com/BrianKhan/XMLUtilities
+[submodule "PropertiesManager"]
+	path = PropertiesManager
+	url = https://github.com/BrianKhan/propertiesmanager
