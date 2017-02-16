@@ -4,3 +4,6 @@
 [submodule "JavaXJson"]
 	path = JavaXJson
 	url = https://github.com/BrianKhan/JavaXJson
+[submodule "AudioManager"]
+	path = AudioManager
+	url = https://github.com/briankhan/audiomanager.git
