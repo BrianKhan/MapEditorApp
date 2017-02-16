@@ -7,3 +7,6 @@
 [submodule "AudioManager"]
 	path = AudioManager
 	url = https://github.com/briankhan/audiomanager.git
+[submodule "XMLUtilities"]
+	path = XMLUtilities
+	url = https://github.com/BrianKhan/XMLUtilities
