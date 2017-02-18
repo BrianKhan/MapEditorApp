@@ -6,8 +6,6 @@
 package rgvm.dialog;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -18,16 +16,12 @@ import javafx.stage.Stage;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
-import javafx.stage.StageStyle;
 import properties_manager.PropertiesManager;
-import saf.components.AppStyleArbiter;
-import static saf.components.AppStyleArbiter.CLASS_BORDERED_PANE;
 import static saf.components.AppStyleArbiter.CLASS_SUBHEADING_LABEL;
 import rgvm.PropertyType;
 import rgvm.data.RegionItem;

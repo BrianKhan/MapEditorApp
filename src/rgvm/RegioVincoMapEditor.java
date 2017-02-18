@@ -10,7 +10,6 @@ import saf.components.AppDataComponent;
 import saf.components.AppFileComponent;
 import saf.components.AppWorkspaceComponent;
 import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
 
 /**
  * This class serves as the application class for our SHP Map File Viewer program. 

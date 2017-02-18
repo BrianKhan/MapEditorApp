@@ -7,29 +7,21 @@ package rgvm.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Modality;
 
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import properties_manager.PropertiesManager;
 
 import rgvm.RegioVincoMapEditor;
 import rgvm.data.DataManager;
 import rgvm.data.RegionItem;
-import rgvm.dialog.ColorDialog;
 import rgvm.dialog.EditDialog;
 import rgvm.dialog.NewDialog;
 import rgvm.dialog.ResizeDialog;
 import rgvm.file.FileManager;
 import rgvm.gui.Workspace;
-import static saf.settings.AppPropertyType.LOAD_WORK_TITLE;
 import static saf.settings.AppStartupConstants.PATH_RAW_FILES;
 import static saf.settings.AppStartupConstants.PATH_WORK;
 import saf.ui.AppMessageDialogSingleton;

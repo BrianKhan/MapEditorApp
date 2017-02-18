@@ -5,21 +5,6 @@
  */
 package rgvm.dialog;
 
-import java.util.concurrent.locks.ReentrantLock;
-import javafx.application.Application;
-import static javafx.application.Application.launch;
-import javafx.application.Platform;
-import javafx.concurrent.Task;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.stage.Stage;
-import java.util.concurrent.locks.ReentrantLock;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -30,23 +15,12 @@ import javafx.stage.Stage;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import properties_manager.PropertiesManager;
-import saf.components.AppStyleArbiter;
-import static saf.components.AppStyleArbiter.CLASS_BORDERED_PANE;
-import static saf.components.AppStyleArbiter.CLASS_SUBHEADING_LABEL;
 import rgvm.PropertyType;
 import rgvm.data.RegionItem;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
 
 /**
  * This class is heavily based on AppYesNoCancelDialogSingleton with changes

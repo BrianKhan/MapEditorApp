@@ -5,7 +5,6 @@
  */
 package rgvm.gui;
 
-import audio_manager.AudioManager;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,11 +13,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.scene.SnapshotParameters;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SplitPane;
@@ -31,15 +28,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Polygon;
@@ -54,8 +47,6 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import properties_manager.PropertiesManager;
 import rgvm.PropertyType;
 import saf.components.AppWorkspaceComponent;
@@ -64,10 +55,6 @@ import rgvm.controller.MapEditorController;
 import rgvm.data.DataManager;
 import rgvm.data.RegionItem;
 import rgvm.dialog.renameDialog;
-import static saf.settings.AppStartupConstants.FILE_PROTOCOL;
-import static saf.settings.AppStartupConstants.PATH_IMAGES;
-import static saf.settings.AppPropertyType.*;
-import static saf.settings.AppStartupConstants.PATH_WORK;
 import saf.ui.AppGUI;
 
 /**
@@ -216,13 +203,12 @@ public class Workspace extends AppWorkspaceComponent {
             File fil = new File("./export");
             directChoose.setInitialDirectory(fil);
             String dcPath;
-                try {
+            try {
                 dcPath = directChoose.showDialog(app.getGUI().getWindow()).getAbsolutePath();
-                }
-                catch(NullPointerException ee) {
-                    dcPath = null;
-                }
-                if (dcPath != null) {
+            } catch (NullPointerException ee) {
+                dcPath = null;
+            }
+            if (dcPath != null) {
                 String mdcPath = dcPath + "/" + dm.getName() + ".png";
                 System.out.println("Saving png file as: " + mdcPath);
                 WritableImage img = firstParent.snapshot(new SnapshotParameters(), null);

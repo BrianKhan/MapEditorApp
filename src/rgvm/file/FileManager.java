@@ -5,8 +5,6 @@
  */
 package rgvm.file;
 
-import java.io.File;
-import javafx.scene.text.Font;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,21 +12,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
-import javafx.application.Platform;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
@@ -41,7 +28,6 @@ import javax.json.JsonWriterFactory;
 import javax.json.stream.JsonGenerator;
 import rgvm.data.DataManager;
 import rgvm.data.RegionItem;
-import rgvm.dialog.ProgressDialog;
 import saf.components.AppDataComponent;
 import saf.components.AppFileComponent;
 
@@ -55,9 +41,9 @@ public class FileManager implements AppFileComponent {
         DataManager dm = (DataManager) data;
         dm.reset();
         JsonObject json = loadJSONFile(filePath);
-        
+
         dm.setName(json.getString("MAP_NAME"));
-        dm.setParent(json.getString("PARENT_DIRECTORY").replace("\\","/"));
+        dm.setParent(json.getString("PARENT_DIRECTORY").replace("\\", "/"));
         dm.setWidth(json.getJsonNumber("WIDTH").doubleValue());
         dm.setHeight(json.getJsonNumber("HEIGHT").doubleValue());
         dm.setThickness(json.getJsonNumber("BORDER_THICKNESS").doubleValue());
@@ -70,7 +56,7 @@ public class FileManager implements AppFileComponent {
         dm.setX(json.getJsonNumber("X").doubleValue());
         dm.setY(json.getJsonNumber("Y").doubleValue());
         JsonArray jsonRegionArray = json.getJsonArray("REGION");
-        
+
         for (int i = 0; i < jsonRegionArray.size(); i++) {
             JsonObject jsonRegion = jsonRegionArray.getJsonObject(i);
             RegionItem region = new RegionItem();
@@ -203,7 +189,7 @@ public class FileManager implements AppFileComponent {
                 .add("BIG_FLAG_PATH", manager.getBigFlagPath())
                 .add("SEAL_PATH", manager.getSealPath())
                 .add("X", manager.getX())
-                .add("Y",manager.getY())
+                .add("Y", manager.getY())
                 .add("REGION", itemsArray).build();
 
         //output the file
@@ -284,7 +270,6 @@ public class FileManager implements AppFileComponent {
         jsonWriter.close();
 
         // INIT THE WRITER
-
         OutputStream os = new FileOutputStream(filePath);
         JsonWriter jsonFileWriter = Json.createWriter(os);
         jsonFileWriter.writeObject(dataManagerJSO);

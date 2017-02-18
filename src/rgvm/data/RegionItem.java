@@ -47,6 +47,7 @@ public class RegionItem {
         return name;
 
     }
+
     public void setPoly(Polygon gon) {
         poly = gon;
     }
@@ -59,6 +60,7 @@ public class RegionItem {
         return capital;
 
     }
+
     public Polygon getPoly() {
         return poly;
     }
@@ -69,6 +71,7 @@ public class RegionItem {
         tempList[1] = y;
         myList.add(tempList);
     }
+
     public ArrayList<Double[]> getList() {
         return myList;
     }
@@ -76,6 +79,7 @@ public class RegionItem {
     public String getName() {
         return name.getValue();
     }
+
     public void setName(String nam) {
         name.setValue(nam);
     }
@@ -84,6 +88,7 @@ public class RegionItem {
         return leader.getValue();
 
     }
+
     public void setLeader(String lead) {
         leader.setValue(lead);
     }
@@ -92,37 +97,48 @@ public class RegionItem {
         return capital.getValue();
 
     }
+
     public void setCapital(String cap) {
         capital.setValue(cap);
     }
+
     public String getFlagPath() {
         return flagPath;
-        
+
     }
+
     public void setFlagPath(String path) {
         flagPath = path;
     }
+
     public String getLeaderPath() {
         return leaderPath;
     }
+
     public void setLeaderPath(String path) {
         leaderPath = path;
     }
+
     public int getRed() {
         return red;
     }
+
     public void setRed(int re) {
         red = re;
     }
+
     public int getBlue() {
         return blue;
     }
+
     public void setBlue(int blu) {
         blue = blu;
     }
+
     public int getGreen() {
         return green;
     }
+
     public void setGreen(int gree) {
         green = gree;
     }
